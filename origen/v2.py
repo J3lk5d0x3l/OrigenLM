@@ -44,7 +44,7 @@ ORIGEN_V2_PRESETS = {
                   hidden_dim=256, max_seq_len=256),
     "student": dict(dim=256, n_layers=6, n_heads=8, n_kv_heads=2,
                     hidden_dim=768, max_seq_len=512),
-    "l4": dict(dim=384, n_layers=8, n_heads=8, n_kv_heads=2,
+    "large": dict(dim=384, n_layers=8, n_heads=8, n_kv_heads=2,
                hidden_dim=1152, max_seq_len=1024),
     "research": dict(dim=768, n_layers=12, n_heads=12, n_kv_heads=3,
                      hidden_dim=2048, max_seq_len=2048),
