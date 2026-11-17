@@ -19,7 +19,7 @@ SIGNATURES = {
     "credencial GitHub": re.compile(r"(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{20,})"),
     "clave tipo OpenAI": re.compile(r"sk-(?:proj-)?[A-Za-z0-9_-]{25,}"),
     "identificador de acceso AWS": re.compile(r"\bAKIA[A-Z0-9]{16}\b"),
-    "clave privada": re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----"),
+    "clave privada": re.compile(r"^\s*-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----"),
     "token Slack": re.compile(r"xox[baprs]-[A-Za-z0-9-]{25,}"),
     "URI MongoDB con credenciales": re.compile(
         r"mongodb(?:\+srv)?://[^/\s:@]{1,150}:[^/\s@]{1,150}@", re.IGNORECASE),
