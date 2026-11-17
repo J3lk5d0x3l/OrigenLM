@@ -1,7 +1,10 @@
 import unittest
 import torch
 from origen.model import ModelConfig, OrigenLM
-from origen.tokenizer import encode, decode, training_example, conversation_prefix, VOCAB_SIZE
+from origen.tokenizer import (
+    DEFAULT_SYSTEM, encode, decode, training_example,
+    conversation_prefix, conversation_prefix_limited, VOCAB_SIZE,
+)
 
 
 class OrigenTests(unittest.TestCase):
@@ -18,6 +21,16 @@ class OrigenTests(unittest.TestCase):
         self.assertEqual(decode(encode("Español café 🐍")), "Español café 🐍")
         self.assertEqual(decode(encode("a\ud800b")), "a?b")
         self.assertEqual(conversation_prefix("sistema", [("Hola", "¡Buenas!")], broken)[-1], 260)
+
+    def test_prompt_matches_training_and_respects_context(self):
+        example = training_example({"user": "Hola", "assistant": "¡Buenas!"})
+        prefix = conversation_prefix_limited(DEFAULT_SYSTEM, [], "Hola", 96)
+        self.assertEqual(prefix, example[:len(prefix)])
+        self.assertLessEqual(len(prefix), 96)
+        history = [("Pregunta larga " * 10, "Respuesta larga " * 10)]
+        self.assertEqual(conversation_prefix_limited(DEFAULT_SYSTEM, history, "Hola", 96), prefix)
+        with self.assertRaisesRegex(ValueError, "excede el contexto"):
+            conversation_prefix_limited(DEFAULT_SYSTEM, [], "x" * 200, 96)
 
     def test_forward_and_backprop(self):
         model = OrigenLM(ModelConfig(dim=32, n_layers=2, n_heads=4, hidden_dim=64, max_seq_len=16))

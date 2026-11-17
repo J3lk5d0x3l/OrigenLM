@@ -116,3 +116,27 @@ No compares directamente la pérdida de entrenamiento con la de evaluación:
 se calculan en muestras distintas, con distribuciones y condiciones de
 contexto que pueden diferir. Para medir una mejora, compara el mismo
 conjunto de evaluación antes y después de entrenar.
+
+## Etapa 3 — diagnóstico de respuestas (sin más entrenamiento)
+
+La instrucción predeterminada de `chat.py` coincide ahora con la utilizada
+para crear los datos de entrenamiento. El prototipo avisa si la pregunta no
+cabe completa en el contexto del checkpoint (96 bytes en las versiones de
+200 y 300 pasos). Los turnos anteriores que no caben se descartan.
+
+Tras guardar ambos checkpoints, puedes comparar respuestas con semillas
+controladas, **sin modificar los pesos**:
+
+```bash
+python -m scripts.comparar_chat
+```
+
+Rutas esperadas: `/workspaces/backup-origenlm/origen_200_pasos.pt` y
+`/workspaces/backup-origenlm/origen_300_pasos.pt`.
+`--seed` en `chat.py` permite repetir pruebas, por ejemplo:
+`python chat.py --seed 42`.
+
+Esto no agrega respuestas predefinidas ni convierte el modelo pequeño en un
+asistente útil. Para avances reales harán falta muchos más datos originales,
+mejor entrenamiento orientado a conversaciones, evaluación cualitativa y un
+modelo con una ventana de contexto mucho mayor.

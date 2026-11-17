@@ -13,6 +13,9 @@ ASSISTANT = 260
 END = 261
 VOCAB_SIZE = 262
 
+# Misma instrucción durante entrenamiento e inferencia.
+DEFAULT_SYSTEM = "Eres Origen, un asistente claro y útil."
+
 
 def encode(text: str) -> list[int]:
     """Encode Unicode as UTF-8 bytes, tolerating malformed terminal input.
@@ -36,7 +39,7 @@ def training_example(item: dict) -> list[int]:
     if not all(key in item for key in ("user", "assistant")):
         raise ValueError("Record needs 'text' or both 'user' and 'assistant'.")
     return [
-        BOS, SYSTEM, *encode(str(item.get("system", "Eres Origen, un asistente claro y útil."))), END,
+        BOS, SYSTEM, *encode(str(item.get("system", DEFAULT_SYSTEM)), END,
         USER, *encode(str(item["user"])), END,
         ASSISTANT, *encode(str(item["assistant"])), EOS,
     ]
@@ -48,3 +51,28 @@ def conversation_prefix(system: str, history: list[tuple[str, str]], user: str) 
         ids += [USER, *encode(question), END, ASSISTANT, *encode(answer), END]
     ids += [USER, *encode(user), END, ASSISTANT]
     return ids
+
+def conversation_prefix_limited(
+    system: str, history: list[tuple[str, str]], user: str, max_seq_len: int
+) -> list[int]:
+    """Conserva la pregunta completa y solo los turnos anteriores que quepan.
+
+    A diferencia del recorte implícito del generador, no pierde en silencio
+    el mensaje del usuario ni la instrucción de sistema. El prototipo tiene
+    un contexto de solo 96 bytes en sus checkpoints iniciales.
+    """
+    if max_seq_len <= 0:
+        raise ValueError("max_seq_len must be positive")
+    selected: list[tuple[str, str]] = []
+    base = conversation_prefix(system, selected, user)
+    if len(base) > max_seq_len:
+        raise ValueError(
+            f"Tu mensaje excede el contexto del modelo ({len(base)} tokens "
+            f"frente al máximo {max_seq_len}). Escribe una pregunta más corta."
+        )
+    for turn in reversed(history):
+        candidate = conversation_prefix(system, [turn, *selected], user)
+        if len(candidate) > max_seq_len:
+            break
+        selected.insert(0, turn)
+    return conversation_prefix(system, selected, user)

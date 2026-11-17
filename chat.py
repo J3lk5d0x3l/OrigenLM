@@ -3,7 +3,7 @@ import argparse
 from pathlib import Path
 import torch
 from origen.model import ModelConfig, OrigenLM
-from origen.tokenizer import conversation_prefix, decode
+from origen.tokenizer import DEFAULT_SYSTEM, conversation_prefix_limited, decode
 
 
 def main():
@@ -11,8 +11,11 @@ def main():
     parser.add_argument("--checkpoint", type=Path, default=Path("checkpoints/origen_latest.pt"))
     parser.add_argument("--max-new-tokens", type=int, default=100)
     parser.add_argument("--temperature", type=float, default=0.8)
-    parser.add_argument("--system", default="Eres Origen, un asistente de IA útil, claro y respetuoso. Responde en español.")
+    parser.add_argument("--system", default=DEFAULT_SYSTEM)
+    parser.add_argument("--seed", type=int, default=None, help="Semilla opcional para repetir una generación")
     args = parser.parse_args()
+    if args.seed is not None:
+        torch.manual_seed(args.seed)
     if not args.checkpoint.exists():
         parser.error("No checkpoint yet. Run: python train.py --steps 100")
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -23,6 +26,7 @@ def main():
     print(f"OrigenLM | local device={device} | trained steps={saved['step']}")
     print("This example may produce nonsense: it is not pretrained on a large corpus.")
     print("Type /salir to quit, /limpiar to clear conversation history.")
+    print(f"Contexto máximo: {model.config.max_seq_len} tokens de bytes UTF-8. Usa preguntas cortas.")
     history = []
     while True:
         try:
@@ -38,7 +42,11 @@ def main():
             continue
         if not user:
             continue
-        prompt = conversation_prefix(args.system, history, user)
+        try:
+            prompt = conversation_prefix_limited(args.system, history, user, model.config.max_seq_len)
+        except ValueError as exc:
+            print(f"[Aviso] {exc}")
+            continue
         tokens = model.generate(prompt, args.max_new_tokens, args.temperature)
         reply = decode(tokens).strip()
         print("Origen >", reply or "[Sin respuesta textual. Necesita más entrenamiento.]")
