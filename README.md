@@ -28,6 +28,17 @@ Si existe un checkpoint, el script continúa su entrenamiento automáticamente.
 cuota de horas-núcleo y configura un presupuesto con límite de gasto.
 Codespaces proporciona CPU remota, no GPU garantizada.
 
+## Camber Cloud (integración preparada)
+
+La documentación de conexión segura por OAuth, empaquetado del proyecto y diagnóstico
+está en [docs/CAMBER.md](docs/CAMBER.md). La autorización y el despliegue requieren
+que el propietario de la cuenta complete el inicio de sesión en Camber.
+
+\`\`\`bash
+python3 scripts/diagnostico_entorno.py
+python3 scripts/preparar_camber.py
+\`\`\`
+
 ## Ejecutar en tu PC
 
 Instala Python 3.10+ y PyTorch CPU desde el índice oficial:
