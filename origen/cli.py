@@ -10,8 +10,9 @@ from .resources import effective_cpu_count, memory_limit_bytes
 ROOT = Path(__file__).resolve().parents[1]
 CHECKPOINT_V2 = ROOT / "checkpoints/origen_v2_latest.pt"
 CHECKPOINT_V1 = ROOT / "checkpoints/origen_latest.pt"
-# Comandos del agente (modelos abiertos + herramientas + MCP); no necesitan PyTorch.
-COMANDOS_AGENTE = ("agente", "preguntar", "modelos", "herramientas", "doctor")
+CHECKPOINT_MASIVO = ROOT / "checkpoints/origen_masivo.pt"
+# Agente con PESOS PROPIOS, herramientas de Internet y MCP.
+COMANDOS_AGENTE = ("agente", "preguntar", "herramientas", "doctor")
 
 
 def chosen_chat(v1: Path = CHECKPOINT_V1, v2: Path = CHECKPOINT_V2) -> str | None:
@@ -33,7 +34,7 @@ def show_status() -> int:
     print(f"Límite RAM cgroup: {format_bytes(memory_limit_bytes())}")
     disk = shutil.disk_usage(ROOT)
     print(f"Espacio libre: {format_bytes(disk.free)} / total {format_bytes(disk.total)}")
-    for name, path in (("v2", CHECKPOINT_V2), ("v1", CHECKPOINT_V1)):
+    for name, path in (("masivo", CHECKPOINT_MASIVO), ("v2", CHECKPOINT_V2), ("v1", CHECKPOINT_V1)):
         print(f"Checkpoint {name}: {path.relative_to(ROOT)}" if path.is_file()
               else f"Checkpoint {name}: todavía no existe")
     data = ROOT / "dataset/chat_v2.jsonl"
@@ -41,9 +42,9 @@ def show_status() -> int:
         with data.open(encoding="utf-8") as source:
             count = sum(bool(row.strip()) for row in source)
         print(f"Datos conversacionales: {count} ejemplos (demostración)")
-    print("Agente con modelos abiertos: origen doctor  |  origen agente")
+    print("Agente con pesos propios y MCP: origen doctor  |  origen agente")
     print("Iniciar conversación con checkpoint propio: origen")
-    print("Entrenamiento explícito: origen entrenar --steps 1000")
+    print("Continuar pesos propios: origen entrenar-masivo --steps 20000")
     return 0
 
 
@@ -55,23 +56,19 @@ def exec_project_script(script: str, arguments: list[str]) -> None:
 def main(argv: list[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     if args and args[0] in ("-h", "--help", "ayuda", "help"):
-        print("""Comando OrigenLM
-Agente (modelos abiertos + herramientas + internet + MCP):
-  origen doctor              Diagnosticar el entorno (Ollama, modelo, MCP)
-  origen modelos             Ver modelos instalados y sugeridos (--instalar ETIQUETA)
-  origen agente [-m MODELO]  Chat interactivo con herramientas (/ayuda dentro del chat)
-  origen preguntar "texto"   Una pregunta y respuesta
-  origen herramientas        Listar herramientas integradas y de servidores MCP
-
-Modelo propio entrenado desde cero:
-  origen                     Abrir chat con mejor checkpoint disponible (v2 o v1)
-  origen estado              Inspeccionar recursos del Codespace y checkpoints
-  origen v1                  Abrir chat del modelo clásico
-  origen v2                  Abrir chat del modelo nuevo
-  origen entrenar [opciones] Entrenar v2 explícitamente (NO se ejecuta al abrir chat)
-  origen pruebas             Ejecutar los tests
-  origen --seed 42           Pasar opciones directamente al chat
-  origen --help              Mostrar ayuda
+        print("""OrigenLM — sin modelos externos
+  origen                           Abrir chat con checkpoint propio
+  origen agente                    Chat con herramientas Internet/MCP y pesos propios
+  origen preguntar "texto"         Pregunta al checkpoint propio
+  origen herramientas              Ver herramientas y conexiones MCP
+  origen doctor                    Diagnosticar recursos y checkpoint
+  origen entrenar-masivo           Descargar corpus autorizado y entrenar pesos ORIGINALES
+  origen entrenar-masivo --dry-run  Ver el plan sin ejecutarlo
+  origen entrenar --steps 1000     Crear modelo v2 desde cero (opcional)
+  origen estado                    Estado de recursos, corpus y pesos
+  origen v1 | origen v2            Elegir un checkpoint histórico
+  origen pruebas                   Ejecutar pruebas
+  origen --help                    Mostrar esta ayuda
 """)
         return 0
     if args and args[0] in COMANDOS_AGENTE:
@@ -81,6 +78,8 @@ Modelo propio entrenado desde cero:
         return show_status()
     if args and args[0] == "pruebas":
         return subprocess.call([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"], cwd=ROOT)
+    if args and args[0] == "entrenar-masivo":
+        exec_project_script("scripts/entrenamiento_masivo.py", args[1:])
     if args and args[0] == "entrenar":
         exec_project_script("train_origen_v2.py", args[1:])
     if args and args[0] in ("v1", "v2"):
@@ -95,10 +94,12 @@ Modelo propio entrenado desde cero:
     elif args and not args[0].startswith("-"):
         print(f"Subcomando desconocido: {args[0]}; usa origen --help", file=sys.stderr)
         return 2
+    # El checkpoint masivo guarda los pesos históricos actualizados de v1.
+    if CHECKPOINT_MASIVO.is_file():
+        exec_project_script("chat.py", ["--checkpoint", str(CHECKPOINT_MASIVO), *args])
     script = chosen_chat()
     if script is None:
-        print("No existe un checkpoint entrenado propio. Para conversar con un modelo abierto usa: "
-              "origen doctor  y  origen agente", file=sys.stderr)
+        print("No existe un checkpoint entrenado propio; ejecuta origen doctor", file=sys.stderr)
         return 2
     if script == "chat.py":
         print("OrigenLM: no hay checkpoint v2; abriendo la versión v1.", flush=True)
