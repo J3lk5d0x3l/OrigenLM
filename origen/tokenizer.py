@@ -15,7 +15,14 @@ VOCAB_SIZE = 262
 
 
 def encode(text: str) -> list[int]:
-    return list(text.encode("utf-8"))
+    """Encode Unicode as UTF-8 bytes, tolerating malformed terminal input.
+
+    Some terminals decode invalid input bytes as surrogate code points.
+    These are not valid Unicode text and cannot be encoded with strict
+    UTF-8; replacing only those invalid code points keeps chats running.
+    Normal Spanish accents and emoji are preserved unchanged.
+    """
+    return list(text.encode("utf-8", errors="replace"))
 
 
 def decode(ids: Iterable[int]) -> str:
