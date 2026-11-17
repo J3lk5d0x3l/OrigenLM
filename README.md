@@ -305,3 +305,9 @@ de ejecuciones anteriores. No se modifica un proceso que ya está ejecutándose.
 Se recomienda no aumentar artificialmente las CPU/hilos ni reducir el número
 de documentos: la métrica importante es rendimiento **con la misma calidad**
 de validación, no únicamente pérdida de entrenamiento.
+
+## Cierre de la generación V1 (antes de entrenar V2)
+
+Ejecuta `origen cerrar-v1` desde Codespaces (o `/cerrar-v1` en el chat después de `/actualizar`). Se crea un ZIP **local** en `dist/v1` que contiene los checkpoints originales, junto con hashes SHA-256, y un informe JSON de la pérdida de respuesta en los mismos 15 ejemplos reservados. El checkpoint ajustado se somete a preguntas deterministas de ejemplo. La ejecución **no realiza entrenamiento ni borra/reescribe los pesos**. `dist/` está ignorado por Git. Debes **descargar el ZIP fuera del Codespace**: una copia en el mismo Codespace no es recuperación ante la eliminación del entorno.
+
+Esta validación de demostración todavía es demasiado pequeña para tomar decisiones sobre capacidades generales. La arquitectura V2 existente es un prototipo con tokenizador por bytes; antes de entrenarla seriamente necesita datos propios de mayor calidad y un tokenizador subword probado en español. No se deben lanzar seis entrenamientos simultáneos en cuatro núcleos: mezclaremos materias con muestreo equilibrado y mediremos GPU/CPU antes de elegir escala.

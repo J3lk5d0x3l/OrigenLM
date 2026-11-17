@@ -4,6 +4,7 @@ from pathlib import Path
 import os
 import shlex
 import sys
+import subprocess
 import torch
 from origen.model import ModelConfig, OrigenLM
 from origen.resources import configure_cpu_threads
@@ -31,7 +32,7 @@ def main():
     model.eval()
     print(f"OrigenLM | local device={device} | trained steps={saved['step']}")
     print("This example may produce nonsense: it is not pretrained on a large corpus.")
-    print("Comandos: /entrenar-masivo, /buscar, /pagina, /herramientas, /usar, /actualizar, /salir")
+    print("Comandos: /cerrar-v1, /entrenar-masivo, /buscar, /pagina, /herramientas, /usar, /actualizar, /salir")
     print(f"Contexto máximo: {model.config.max_seq_len} tokens de bytes UTF-8. Usa preguntas cortas.")
     herramientas = None
     history = []
@@ -41,6 +42,10 @@ def main():
         except (EOFError, KeyboardInterrupt):
             print("\nSaliendo.")
             break
+        if user.lower() == "/cerrar-v1":
+            print("[OrigenLM] Respaldando y evaluando V1...", flush=True)
+            subprocess.run([sys.executable, "-m", "scripts.cerrar_v1"], cwd=Path(__file__).resolve().parent, check=False)
+            continue
         if user.startswith("/entrenar-masivo"):
             # Entrena el checkpoint original v1 y lo guarda en otro archivo.
             try:
