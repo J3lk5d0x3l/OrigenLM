@@ -1,10 +1,12 @@
 """Chat interactivo con los pesos PROPIOS de OrigenLM v2."""
 import argparse
 from pathlib import Path
+import os
 
 import torch
 
 from origen.v2 import OrigenV2Config, OrigenV2
+from origen.resources import configure_cpu_threads
 from origen.tokenizer import DEFAULT_SYSTEM, conversation_prefix_limited, decode
 
 
@@ -19,6 +21,7 @@ def main():
     args = parser.parse_args()
     if not args.checkpoint.is_file():
         parser.error(f"No existe el checkpoint: {args.checkpoint}. Entrena antes de conversar.")
+    configure_cpu_threads("chat")
     saved = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
     if saved.get("architecture") != "origen-v2-gqa-v1":
         parser.error("El checkpoint indicado no es de OrigenLM v2")
@@ -30,7 +33,7 @@ def main():
         torch.manual_seed(args.seed)
     print(f"OrigenLM v2 | paso {saved['step']} | dispositivo={device} | ventana={model.config.max_seq_len}")
     print("Prototipo en entrenamiento; puede responder incoherencias.")
-    print("Escribe /salir para cerrar, /limpiar para reiniciar el historial.")
+    print("Escribe /salir para cerrar, /limpiar para reiniciar, /actualizar para recargar.")
     history = []
     while True:
         try:
@@ -40,6 +43,9 @@ def main():
             break
         if question.casefold() == "/salir":
             break
+        if question.casefold() == "/actualizar":
+            lanzador = Path(__file__).resolve().parent / "scripts/origen"
+            os.execv("/bin/bash", ["/bin/bash", str(lanzador), "v2"])
         if question.casefold() == "/limpiar":
             history.clear()
             print("Historial reiniciado.")

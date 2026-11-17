@@ -12,6 +12,7 @@ import torch
 
 from origen.chat_training import batchify, prepare_records, read_chat_dataset, response_nll
 from origen.v2 import ORIGEN_V2_PRESETS, OrigenV2Config, OrigenV2
+from origen.resources import configure_cpu_threads
 
 
 def main():
@@ -46,7 +47,7 @@ def main():
         parser.error("El checkpoint de salida ya existe. Usa --resume con esa ruta o --overwrite.")
     if args.resume and not args.resume.is_file():
         parser.error(f"Checkpoint no encontrado: {args.resume}")
-    torch.set_num_threads(max(1, int(os.environ.get("OMP_NUM_THREADS", "2"))))
+    cpu_threads = configure_cpu_threads("train")
     random.seed(args.seed)
     torch.manual_seed(args.seed)
     if args.resume:
@@ -101,7 +102,7 @@ def main():
     precision = torch.autocast(device_type="cuda", dtype=torch.bfloat16) if use_bfloat16 else nullcontext()
 
     print(f"OrigenLM v2 | dispositivo={device} | parámetros={model.count_parameters():,}")
-    print(f"Hilos CPU: {torch.get_num_threads()} | warmup {args.warmup} | lr {args.lr:.2e} -> {args.lr*args.min_lr_ratio:.2e}")
+    print(f"Hilos CPU: {cpu_threads} | warmup {args.warmup} | lr {args.lr:.2e} -> {args.lr*args.min_lr_ratio:.2e}")
     print(f"Ventana de contexto: {cfg.max_seq_len} tokens | ejemplos: {len(training)} | validación: {len(validation)}")
     print("Pesos originales aleatorios." if not saved else f"Continuando checkpoint propio desde paso {start_step}.")
     print("Advertencia: los datos de demostración no producen una IA de capacidades avanzadas.")

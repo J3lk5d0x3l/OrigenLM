@@ -20,5 +20,6 @@
   "build": {
     "dockerfile": "Dockerfile",
     "context": "."
-  }
+  },
+  "postStartCommand": "bash scripts/instalar_origen.sh"
 }

@@ -191,3 +191,37 @@ Se ha integrado una arquitectura propia GQA con presets configurables bajo el no
 - `docs/ORIGEN_V2_CODESPACES.md`: guía de la línea v2.
 
 **Prioridad: GitHub Codespaces CPU.** Camber no se usará salvo una futura decisión explícita. No iniciar entrenamiento grande con las 133 conversaciones de demostración.
+
+
+## Comando directo y sincronización automática desde Codespaces
+
+Instalación **una única vez** en un Codespace ya abierto:
+
+```bash
+bash scripts/instalar_origen.sh
+```
+
+En inicios posteriores del devcontainer se instala automáticamente por
+`postStartCommand`. Escribe `origen` para conversar (v2 si existe
+`checkpoints/origen_v2_latest.pt`, de lo contrario usa el v1), o:
+`origen estado`, `origen v1`, `origen v2`, `origen entrenar --steps 1000`,
+`origen pruebas`. En el chat, `/actualizar` sincroniza y recarga sin cerrar
+la terminal. Para omitir la sincronización: `ORIGEN_NO_SYNC=1 origen`.
+
+**Sincronización:** al ejecutar `origen`, el lanzador intenta
+`git pull --ff-only origin main` con timeout de 20 segundos y únicamente
+si está en `main` sin cambios locales en archivos rastreados. No fuerza
+merges ni borra archivos, y si el repositorio diverge o está desconectado
+continúa con la copia local. El proceso abierto no se reinicia de forma
+automática mientras conversas: usa `/actualizar` para eso.
+
+**GitHub Actions** ejecuta pruebas y comprobación de sintaxis en cada push
+y pull request. No modifica la copia de Codespaces ni entrena pesos de forma
+automática. Los checkpoints se guardan fuera de Git y no se mueven con
+`git pull`.
+
+Con una máquina de 4 vCPU y 16 GiB, el entrenador v2 detecta núcleos
+efectivos y configura sus hilos CPU sin fijar el antiguo valor de 2;
+el chat usa hasta 2 por defecto para minimizar latencia. No se
+pretende asignar el 100 % de RAM/disco: eso provocaría falta de recursos.
+El corpus disponible sigue siendo pequeño.
