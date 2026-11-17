@@ -2,11 +2,14 @@
 import argparse
 from pathlib import Path
 import os
+import shlex
+import sys
 
 import torch
 
 from origen.v2 import OrigenV2Config, OrigenV2
 from origen.resources import configure_cpu_threads
+from origen.herramientas_chat import SesionHerramientas, es_comando_herramienta
 from origen.tokenizer import DEFAULT_SYSTEM, conversation_prefix_limited, decode
 
 
@@ -33,7 +36,8 @@ def main():
         torch.manual_seed(args.seed)
     print(f"OrigenLM v2 | paso {saved['step']} | dispositivo={device} | ventana={model.config.max_seq_len}")
     print("Prototipo en entrenamiento; puede responder incoherencias.")
-    print("Escribe /salir para cerrar, /limpiar para reiniciar, /actualizar para recargar.")
+    print("Comandos: /entrenar-masivo, /buscar, /pagina, /herramientas, /usar, /actualizar, /salir")
+    herramientas = None
     history = []
     while True:
         try:
@@ -41,6 +45,25 @@ def main():
         except (EOFError, KeyboardInterrupt):
             print("\nSaliendo.")
             break
+        if question.startswith("/entrenar-masivo"):
+            # Entrena el checkpoint original v1 y lo guarda en otro archivo.
+            try:
+                opciones = shlex.split(question)[1:]
+            except ValueError as exc:
+                print(f"[OrigenLM] Opciones inválidas: {exc}")
+                continue
+            if herramientas is not None:
+                herramientas.cerrar()
+            print("[OrigenLM] Iniciando entrenamiento real del modelo propio...", flush=True)
+            os.execv(sys.executable, [sys.executable, "-m", "scripts.entrenamiento_masivo", *opciones])
+        if es_comando_herramienta(question):
+            try:
+                if herramientas is None:
+                    herramientas = SesionHerramientas()
+                herramientas.ejecutar(question)
+            except (OSError, ValueError, RuntimeError) as exc:
+                print(f"[OrigenLM] Error de herramienta: {exc}")
+            continue
         if question.casefold() == "/salir":
             break
         if question.casefold() == "/actualizar":
@@ -67,6 +90,9 @@ def main():
         print("Origen >", reply)
         history.append((question, reply))
         history = history[-10:]
+
+    if herramientas is not None:
+        herramientas.cerrar()
 
 
 if __name__ == "__main__":
