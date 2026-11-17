@@ -24,7 +24,7 @@ La persona quiere pasar de experimentos de 100 pasos a una canalización integra
 1. Inspecciona Git, ramas, cambios locales, scripts, checkpoints, tests y rutas. No descartes cambios locales del usuario.
 2. Ejecuta las pruebas actuales, comprueba importaciones y diagnostica recursos con `python scripts/diagnostico_cpu.py`, `nproc`, `free -h`, `df -h`, Python, PyTorch y límites cgroup.
 3. Detecta núcleos efectivos disponibles y límite real de RAM. Compara 1, 2, hasta N hilos en benchmarks cortos y reproducibles; ajusta `OMP_NUM_THREADS`, `MKL_NUM_THREADS`, `torch.set_num_threads`, carga de datos y lotes. No maximices la memoria: deja margen para el sistema.
-4. Estima bytes/s, tokens/s, tiempo por paso y memoria de entrenamiento de los presets `micro`, `student`, `l4` y `research` si existen. No entrenes presets enormes que superen RAM o que hagan imposible terminar una etapa razonable.
+4. Estima bytes/s, tokens/s, tiempo por paso y memoria de entrenamiento de los presets `micro`, `student`, `large` y `research` si existen. No entrenes presets enormes que superen RAM o que hagan imposible terminar una etapa razonable.
 5. No cambies el tipo de máquina Codespaces ni habilites gasto fuera de cuota sin autorización expresa. Si conviene pasar a 4 u 8 núcleos, informa disponibilidad y efecto sobre horas-núcleo sin efectuar cambios.
 
 ### Fase B: biblioteca de datos propia y reproducible
