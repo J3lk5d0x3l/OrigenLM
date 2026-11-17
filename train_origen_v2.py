@@ -3,6 +3,7 @@ import argparse
 from contextlib import nullcontext
 from dataclasses import asdict
 import json
+import math
 import os
 from pathlib import Path
 import random
@@ -25,6 +26,9 @@ def main():
     parser.add_argument("--batch-size", type=int, default=2)
     parser.add_argument("--grad-accum", type=int, default=1)
     parser.add_argument("--lr", type=float, default=0.0003)
+    parser.add_argument("--warmup", type=int, default=50, help="Pasos de calentamiento lineal del LR")
+    parser.add_argument("--min-lr-ratio", type=float, default=0.1,
+                        help="LR final del coseno como fracción de --lr")
     parser.add_argument("--save-every", type=int, default=100)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--overwrite", action="store_true", help="Permitir reemplazar un destino existente")
@@ -32,6 +36,10 @@ def main():
 
     if min(args.steps, args.batch_size, args.grad_accum, args.save_every) < 1 or args.lr <= 0:
         parser.error("steps, batch-size, grad-accum, save-every y lr deben ser positivos")
+    if args.warmup < 0 or not 0 <= args.min_lr_ratio <= 1:
+        parser.error("warmup no puede ser negativo y min-lr-ratio debe estar en [0, 1]")
+    if args.warmup >= args.steps:
+        parser.error("warmup debe ser menor que steps para que exista fase de coseno")
     if args.resume and args.config:
         parser.error("--config no se usa junto con --resume: la arquitectura viene del checkpoint")
     if args.output.exists() and not (args.overwrite or (args.resume and args.resume.resolve() == args.output.resolve())):
@@ -66,7 +74,25 @@ def main():
     model = OrigenV2(cfg).to(device)
     if saved:
         model.load_state_dict(saved["model"])
-    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.01)
+    # RMSNorm y embeddings no se regularizan: el decay sobre ellos degrada la
+    # escala de las normas y, al estar lm_head atado a tokens, penaliza dos veces.
+    decay, no_decay = [], []
+    for name, parameter in model.named_parameters():
+        if not parameter.requires_grad:
+            continue
+        (no_decay if parameter.ndim < 2 or "tokens" in name else decay).append(parameter)
+    optimizer = torch.optim.AdamW(
+        [{"params": decay, "weight_decay": 0.01},
+         {"params": no_decay, "weight_decay": 0.0}], lr=args.lr)
+
+    def learning_rate(current: int) -> float:
+        """Calentamiento lineal y después decaimiento coseno hasta min_lr_ratio."""
+        done = current - start_step
+        if done <= args.warmup:
+            return args.lr * done / max(1, args.warmup)
+        progress = (done - args.warmup) / max(1, args.steps - args.warmup)
+        cosine = 0.5 * (1.0 + math.cos(math.pi * min(1.0, progress)))
+        return args.lr * (args.min_lr_ratio + (1 - args.min_lr_ratio) * cosine)
     if saved and "optimizer" in saved:
         optimizer.load_state_dict(saved["optimizer"])
     start_step = int(saved["step"]) if saved else 0
@@ -75,6 +101,7 @@ def main():
     precision = torch.autocast(device_type="cuda", dtype=torch.bfloat16) if use_bfloat16 else nullcontext()
 
     print(f"OrigenLM v2 | dispositivo={device} | parámetros={model.count_parameters():,}")
+    print(f"Hilos CPU: {torch.get_num_threads()} | warmup {args.warmup} | lr {args.lr:.2e} -> {args.lr*args.min_lr_ratio:.2e}")
     print(f"Ventana de contexto: {cfg.max_seq_len} tokens | ejemplos: {len(training)} | validación: {len(validation)}")
     print("Pesos originales aleatorios." if not saved else f"Continuando checkpoint propio desde paso {start_step}.")
     print("Advertencia: los datos de demostración no producen una IA de capacidades avanzadas.")
@@ -83,6 +110,9 @@ def main():
     args.output.parent.mkdir(parents=True, exist_ok=True)
 
     for step in range(start_step + 1, start_step + args.steps + 1):
+        current_lr = learning_rate(step)
+        for group in optimizer.param_groups:
+            group["lr"] = current_lr
         model.train()
         optimizer.zero_grad(set_to_none=True)
         total_loss = 0.0
@@ -96,7 +126,7 @@ def main():
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         optimizer.step()
         if step == start_step + 1 or step % 10 == 0:
-            print(f"paso {step:5d} | NLL batch de respuestas: {total_loss:.4f}", flush=True)
+            print(f"paso {step:5d} | NLL batch de respuestas: {total_loss:.4f} | lr {current_lr:.2e}", flush=True)
         if step % args.save_every == 0 or step == start_step + args.steps:
             val_loss, val_count = response_nll(model, validation_samples)
             payload = {
