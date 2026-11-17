@@ -1,25 +1,30 @@
-# Contribuir a OrigenLM
+# Colaborar en OrigenLM
 
-¡Gracias por apoyar un proyecto de IA desarrollado desde Colombia!
+¡Gracias por querer contribuir a una inteligencia artificial creada desde Colombia!
 
-## Antes de contribuir
+## ¿Cómo participar?
 
-1. Abre un issue para proponer cambios grandes y evitar trabajo duplicado.
-2. Trabaja en una rama desde `main` y envía un pull request pequeño y enfocado.
-3. Ejecuta `python -m unittest discover -s tests -v` y `python -m scripts.auditar_publicacion --history`; añade pruebas para el código modificado.
-4. Describe qué cambió, cómo se probó y cualquier limitación conocida.
-5. Usa mensajes de commit claros, por ejemplo `fix(tokenizer): corregir Unicode`.
+1. Entra a nuestro [Discord](https://discord.vyrron.net) y cuéntanos que te interesa colaborar en **OrigenLM**.
+2. Indica en qué te gustaría ayudar: modelos y entrenamiento, datasets, backend, interfaces, pruebas, documentación o infraestructura.
+3. Comenta tu idea con la comunidad; si requiere seguimiento, abre un issue en GitHub.
+4. Trabaja en una rama propia y envía un pull request pequeño, con descripción clara de los cambios.
 
-## Reglas del proyecto
+Las propuestas se evalúan por su utilidad y calidad; no es obligatorio tener experiencia profesional para participar.
 
-- Nada de credenciales, archivos privados, dumps, conversaciones personales ni checkpoints pesados en Git.
-- Usa solo datasets y dependencias con licencias y derechos adecuados; documenta la procedencia.
-- No afirmes capacidades que no hayan sido medidas. Los modelos actuales son experimentales.
-- No inicies entrenamientos costosos o despliegues con cargo sin aprobación del mantenedor.
-- Las herramientas que ejecutan acciones deben solicitar permisos y respetar las restricciones de seguridad.
+## Antes de enviar un pull request
 
-## Comunidad
+- Ejecuta `python -m unittest discover -s tests -v` y, si corresponde, agrega o actualiza las pruebas.
+- Verifica que no subes claves, credenciales, archivos privados, corpus sin derechos o checkpoints pesados.
+- Si contribuyes datos, documenta el origen, la licencia y el permiso de reutilización.
+- Describe cómo probaste el cambio y evita anunciar capacidades que no están demostradas.
+- No inicies despliegues ni entrenamientos que generen costes sin autorización.
 
-Preguntas generales: [Discord de OrigenLM](https://discord.biron.net).
+## Identidad del proyecto
 
-Vulnerabilidades: consulta [SECURITY.md](SECURITY.md); **no** compartas detalles sensibles en Discord ni en issues públicos.
+El código se distribuye bajo [MIT](LICENSE), pero **OrigenLM** es el nombre elegido por su creador para identificar este proyecto. Antes de publicar un derivado bajo ese mismo nombre, consulta la [política de marca](TRADEMARKS.md).
+
+## Comunidad y seguridad
+
+[Discord — OrigenLM](https://discord.vyrron.net) · [GitHub Sponsors](https://github.com/sponsors/J3lk5d0x3l)
+
+Para reportar vulnerabilidades o posibles filtraciones, sigue [SECURITY.md](SECURITY.md) y evita publicar detalles sensibles en canales públicos.

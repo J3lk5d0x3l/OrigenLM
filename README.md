@@ -2,45 +2,32 @@
 
 # OrigenLM
 
-**Un modelo de lenguaje abierto, creado en Colombia.**
+**Inteligencia artificial creada desde Colombia.**
 
-Investigación reproducible · Pesos propios · Comunidad latinoamericana
+Un proyecto independiente para desarrollar modelos de lenguaje con pesos propios, investigación abierta y una comunidad de colaboradores de Latinoamérica.
 
-[![Pruebas](https://github.com/J3lk5d0x3l/OrigenLM/actions/workflows/tests.yml/badge.svg)](https://github.com/J3lk5d0x3l/OrigenLM/actions/workflows/tests.yml)
+[![Tests](https://github.com/J3lk5d0x3l/OrigenLM/actions/workflows/tests.yml/badge.svg)](https://github.com/J3lk5d0x3l/OrigenLM/actions/workflows/tests.yml)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Licencia](https://img.shields.io/badge/licencia-MIT-555555)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-555555.svg)](LICENSE)
+[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-EA4AAA?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/J3lk5d0x3l)
 
-[**Comenzar**](#comenzar) · [**Arquitectura**](ARQUITECTURA.md) · [**Colaborar**](CONTRIBUTING.md) · [**Discord**](https://discord.vyrron.net)
+[**Comenzar**](#comenzar) · [**Colaborar**](#colaborar) · [**Patrocinar**](#patrocinar) · [**Discord**](https://discord.vyrron.net)
 
 </div>
 
 ---
 
-### ¿Qué es OrigenLM?
+## El proyecto
 
-OrigenLM es un proyecto de investigación para construir y entrenar un modelo de lenguaje **con pesos propios**, sin depender de checkpoints preentrenados de terceros.
+**OrigenLM** busca construir una inteligencia artificial desarrollada desde cero, con identidad colombiana y participación abierta de la comunidad. El código incluye modelos Transformer, tokenizadores propios, herramientas de entrenamiento, evaluación y una interfaz experimental por terminal.
 
-El objetivo es desarrollar tecnología de IA accesible, verificable y útil para personas y desarrolladores de Colombia y Latinoamérica.
+El propósito es avanzar hacia un asistente accesible y útil, construido con transparencia y colaboración.
 
-> **Estado: experimental.** El primer modelo (V1, 357.600 parámetros) completó su preentrenamiento y ajuste conversacional, pero todavía produce respuestas incorrectas o incoherentes. No es un sustituto de asistentes comerciales.
+> OrigenLM sigue en investigación. El código público no incluye los checkpoints entrenados ni implica que exista ya un asistente de producción.
 
-### Estado del proyecto
+## Comenzar
 
-| Componente | Estado |
-|---|---|
-| OrigenLM V1 · Transformer y entrenamiento desde cero | Implementado y probado |
-| Checkpoints, corpus y evaluación separada | Implementados |
-| Herramientas locales, web y conectividad MCP | Prototipos experimentales |
-| OrigenLM V2 · arquitectura GQA y KV-cache | Prototipo disponible |
-| Tokenizador BPE propio y preparación de corpus V2 | Disponibles |
-| Preentrenamiento completo de V2 con BPE | Pendiente |
-| Aplicaciones web, móvil y escritorio | Proyectadas |
-
-**Nota:** V2 aún no está entrenado con el tokenizador BPE; tener su código no significa disponer de un nuevo modelo funcional. Los pesos V1 se conservan por separado.
-
-### Comenzar
-
-Necesitas Python **3.11 o superior**. Clona el repositorio y ejecuta:
+Requiere Python 3.11 o superior.
 
 ```bash
 git clone https://github.com/J3lk5d0x3l/OrigenLM.git
@@ -50,47 +37,40 @@ python -m unittest discover -s tests -v
 python -m origen.cli estado
 ```
 
-En GitHub Codespaces, el lanzador `origen` se instala al iniciar el contenedor.
+En Codespaces también puedes utilizar el comando `origen` para abrir el proyecto una vez instalado el entorno. Consulta la [guía de desarrollo](docs/DESARROLLO.md) para preparar datos y trabajar con los entrenadores.
 
-| Comando | Función |
-|---|---|
-| `origen estado` | Ver recursos y checkpoints |
-| `origen benchmark` | Comparar rendimiento en CPU |
-| `origen cerrar-v1` | Evaluar V1 y crear respaldo local |
-| `origen preparar-v2` | Crear vocabulario BPE y shards V2 desde fuentes autorizadas |
-| `origen pruebas` | Ejecutar pruebas |
-
-Para entrenar un **modelo de demostración desde cero** (no el V1 entrenado del equipo):
-
-```bash
-python train.py --preset tiny --steps 100 --batch-size 2 --seq-len 96
-python chat.py --checkpoint checkpoints/origen_latest.pt
-```
-
-Los datasets externos, los pesos entrenados y los respaldos **no están incluidos** en el repositorio. La preparación de V2 necesita un corpus local cuyo uso esté autorizado. Consulta [desarrollo](docs/DESARROLLO.md) para detalles.
-
-### Proyecto
+## Estructura
 
 ```text
-origen/     Modelos, tokenizadores, agentes y utilidades
-scripts/    Preparación de datos, benchmarks y diagnósticos
-train*.py   Entrenamiento experimental
-chat*.py    Inferencia local por terminal
-dataset/    Ejemplos pequeños de demostración y evaluación
-tests/      Pruebas automáticas
-docs/       Guía de desarrollo
+origen/       Arquitecturas, tokenizadores y herramientas
+scripts/      Procesamiento de datos, entrenamiento y utilidades
+dataset/      Ejemplos públicos y datos de evaluación
+tests/        Pruebas automatizadas del proyecto
+docs/         Documentación técnica
+train*.py     Entrenadores
+chat*.py      Interfaces de conversación experimentales
 ```
 
-### Colaborar
+## Colaborar
 
-Las contribuciones de código, pruebas, documentación y datasets **con derechos de uso verificables** son bienvenidas. Antes de abrir un pull request, lee [CONTRIBUTING.md](CONTRIBUTING.md).
+¿Te gustaría mejorar el modelo, aportar datos autorizados, programar herramientas o trabajar en la infraestructura?
 
-Para reportar una vulnerabilidad consulta [SECURITY.md](SECURITY.md); no publiques credenciales ni detalles sensibles en issues.
+**[Únete a nuestro Discord](https://discord.vyrron.net)** y cuéntanos que quieres colaborar en OrigenLM, en qué área te gustaría participar y qué experiencia tienes. Coordinamos propuestas y después trabajamos mediante *issues* y *pull requests*.
 
-### Comunidad
+Lee la [guía para colaboradores](CONTRIBUTING.md) antes de enviar cambios.
 
-¿Quieres aportar a una IA desarrollada desde Colombia?
+## Patrocinar
 
-**[Únete a Discord — discord.vyrron.net](https://discord.vyrron.net)**
+OrigenLM necesita infraestructura, almacenamiento y capacidad de cómputo para seguir creciendo. Los patrocinios apoyan su investigación y el objetivo de hacer el modelo cada vez más accesible públicamente.
 
-<sub>Código bajo licencia [MIT](LICENSE). Los derechos y condiciones de uso de fuentes externas y checkpoints son independientes.</sub>
+**[Apoya el desarrollo en GitHub Sponsors](https://github.com/sponsors/J3lk5d0x3l)**
+
+---
+
+<div align="center">
+  <sub>
+    Código bajo <a href="LICENSE">licencia MIT</a> ·
+    Nombre e identidad de OrigenLM sujetos a la <a href="TRADEMARKS.md">política de marca</a> ·
+    <a href="https://discord.vyrron.net">Comunidad Discord</a>
+  </sub>
+</div>
