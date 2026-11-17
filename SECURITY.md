@@ -23,3 +23,8 @@ explícitos y aislamiento adecuado.
 No publiques datasets privados ni checkpoints en los que se hayan incorporado secretos.
 
 Los cambios de seguridad se revisan y se prueban antes de su divulgación.
+
+## Auditoría antes de publicar
+
+Con el historial Git completo ejecuta `python -m scripts.auditar_publicacion --history`.
+El escáner revisa firmas evidentes y rutas sensibles, pero **no demuestra** que el historial esté libre de secretos, información personal o datos sin derechos. Si detectas credenciales reales, revócalas y evalúa una remediación del historial antes de cambiar la visibilidad.

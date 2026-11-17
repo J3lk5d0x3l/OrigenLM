@@ -22,3 +22,12 @@ dataset/correcciones_locales.jsonl
 conversaciones/
 
 dataset/preparado_v2/
+
+# Otros artefactos entrenados y secretos locales
+*.pth
+*.ckpt
+*.safetensors
+*.pem
+*.p12
+*.pfx
+*.key

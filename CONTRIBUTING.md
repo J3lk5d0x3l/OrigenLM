@@ -6,7 +6,7 @@
 
 1. Abre un issue para proponer cambios grandes y evitar trabajo duplicado.
 2. Trabaja en una rama desde `main` y envía un pull request pequeño y enfocado.
-3. Ejecuta `python -m unittest discover -s tests -v` y añade pruebas para el código modificado.
+3. Ejecuta `python -m unittest discover -s tests -v` y `python -m scripts.auditar_publicacion --history`; añade pruebas para el código modificado.
 4. Describe qué cambió, cómo se probó y cualquier limitación conocida.
 5. Usa mensajes de commit claros, por ejemplo `fix(tokenizer): corregir Unicode`.
 
