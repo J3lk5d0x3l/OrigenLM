@@ -83,7 +83,6 @@ def preparar_corpus(source: Path, output: Path, max_source_bytes: int = MAX_SOUR
                 writer = writers[split]
                 # Escribir secuencias incrementales; no construir lista de tokens.
                 writer.write(HEADER.pack(BOS))
-                writer.write(encoded.translate(bytes.maketrans(bytes(range(256)),bytes(range(256))))) if False else None
                 # uint16 le; por bloques para no duplicar el documento en RAM.
                 for i in range(0, len(encoded), 16384):
                     piece = encoded[i:i + 16384]
