@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CHECKPOINT_V2 = ROOT / "checkpoints/origen_v2_latest.pt"
 CHECKPOINT_V1 = ROOT / "checkpoints/origen_latest.pt"
 CHECKPOINT_MASIVO = ROOT / "checkpoints/origen_masivo.pt"
+CHECKPOINT_AJUSTADO = ROOT / "checkpoints/origen_ajustado.pt"
 # Agente con PESOS PROPIOS, herramientas de Internet y MCP.
 COMANDOS_AGENTE = ("agente", "preguntar", "herramientas", "doctor")
 
@@ -34,7 +35,7 @@ def show_status() -> int:
     print(f"Límite RAM cgroup: {format_bytes(memory_limit_bytes())}")
     disk = shutil.disk_usage(ROOT)
     print(f"Espacio libre: {format_bytes(disk.free)} / total {format_bytes(disk.total)}")
-    for name, path in (("masivo", CHECKPOINT_MASIVO), ("v2", CHECKPOINT_V2), ("v1", CHECKPOINT_V1)):
+    for name, path in (("ajustado", CHECKPOINT_AJUSTADO), ("masivo", CHECKPOINT_MASIVO), ("v2", CHECKPOINT_V2), ("v1", CHECKPOINT_V1)):
         print(f"Checkpoint {name}: {path.relative_to(ROOT)}" if path.is_file()
               else f"Checkpoint {name}: todavía no existe")
     data = ROOT / "dataset/chat_v2.jsonl"
@@ -94,6 +95,9 @@ def main(argv: list[str] | None = None) -> int:
     elif args and not args[0].startswith("-"):
         print(f"Subcomando desconocido: {args[0]}; usa origen --help", file=sys.stderr)
         return 2
+    # Priorizar el checkpoint propio después del ajuste conversacional.
+    if CHECKPOINT_AJUSTADO.is_file():
+        exec_project_script("chat.py", ["--checkpoint", str(CHECKPOINT_AJUSTADO), *args])
     # El checkpoint masivo guarda los pesos históricos actualizados de v1.
     if CHECKPOINT_MASIVO.is_file():
         exec_project_script("chat.py", ["--checkpoint", str(CHECKPOINT_MASIVO), *args])
