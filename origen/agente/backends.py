@@ -19,6 +19,7 @@ class BackendError(RuntimeError):
 
 def checkpoint_predeterminado():
     candidates = [
+        ROOT / "checkpoints/origen_ajustado.pt",
         ROOT / "checkpoints/origen_masivo.pt",
         ROOT / "checkpoints/origen_v2_latest.pt",
         ROOT / "checkpoints/origen_latest.pt",
