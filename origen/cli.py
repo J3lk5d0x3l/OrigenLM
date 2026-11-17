@@ -69,6 +69,7 @@ def main(argv: list[str] | None = None) -> int:
   origen entrenar-masivo --dry-run  Ver el plan sin ejecutarlo
   origen benchmark                 Medir rendimiento de hilos y lotes sin tocar pesos
   origen cerrar-v1                 Respaldar pesos V1 y evaluar su calidad
+  origen preparar-v2               Aprender BPE y preparar corpus V2 sin entrenar
   origen entrenar --steps 1000     Crear modelo v2 desde cero (opcional)
   origen estado                    Estado de recursos, corpus y pesos
   origen v1 | origen v2            Elegir un checkpoint histórico
@@ -83,6 +84,15 @@ def main(argv: list[str] | None = None) -> int:
         return show_status()
     if args and args[0] == "pruebas":
         return subprocess.call([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"], cwd=ROOT)
+    if args and args[0] == "preparar-v2":
+        try:
+            import tokenizers  # noqa: F401
+        except ImportError:
+            print('[OrigenLM] Instalando tokenizers para entrenar vocabulario propio...', flush=True)
+            if subprocess.call([sys.executable, '-m', 'pip', 'install', 'tokenizers>=0.20,<1']) != 0:
+                return 2
+        os.chdir(ROOT)
+        return subprocess.call([sys.executable, '-m', 'scripts.preparar_v2', *args[1:]])
     if args and args[0] == "cerrar-v1":
         os.chdir(ROOT)
         return subprocess.call([sys.executable, "-m", "scripts.cerrar_v1", *args[1:]])

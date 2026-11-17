@@ -19,6 +19,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install "numpy>=1.26,<2"
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install 'tokenizers>=0.20,<1'
       - name: Verificar sintaxis de lanzadores Bash
         run: bash -n scripts/origen scripts/instalar_origen.sh
       - name: Comprobar sintaxis de la CLI y los scripts

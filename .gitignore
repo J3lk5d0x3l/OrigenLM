@@ -20,3 +20,5 @@ dataset/preparado/
 dataset/fuentes_procedencia.json
 dataset/correcciones_locales.jsonl
 conversaciones/
+
+dataset/preparado_v2/
