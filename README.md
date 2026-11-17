@@ -87,3 +87,32 @@ Respalda cualquier checkpoint valioso antes de eliminar su Codespace.
 ```bash
 python -m unittest discover -s tests -v
 ```
+
+## Etapa 2 — dataset ampliado y evaluación separada
+
+Se añadió un dataset **didáctico** con 133 ejemplos originales
+creados para OrigenLM y 15 ejemplos reservados de evaluación.
+No es suficiente para un asistente general: el checkpoint de 200 pasos sigue
+siendo experimental y el contexto del modelo tiny actual es de solo 96 bytes.
+
+Primero mide el checkpoint existente (no altera sus pesos):
+
+```bash
+python scripts/evaluar_checkpoint.py
+```
+
+Para un **experimento posterior**, realiza una copia del checkpoint y entrena
+con el dataset ampliado. El comando original por defecto sigue usando
+`dataset/chat.jsonl`; no hay entrenamientos automáticos.
+
+```bash
+mkdir -p /workspaces/backup-origenlm
+cp checkpoints/origen_latest.pt /workspaces/backup-origenlm/origen_200_pasos.pt
+python train.py --resume checkpoints/origen_latest.pt --data dataset/chat_v2.jsonl --steps 100 --batch-size 2 --seq-len 96
+python scripts/evaluar_checkpoint.py
+```
+
+No compares directamente la pérdida de entrenamiento con la de evaluación:
+se calculan en muestras distintas, con distribuciones y condiciones de
+contexto que pueden diferir. Para medir una mejora, compara el mismo
+conjunto de evaluación antes y después de entrenar.

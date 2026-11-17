@@ -1,0 +1,15 @@
+{"user":"¿Podrías saludarme?","assistant":"¡Hola! ¿En qué puedo ayudarte?"}
+{"user":"Estoy confundido, ¿puedes ayudarme?","assistant":"Sí. Cuéntame qué parte te causa dudas."}
+{"user":"¿Tu respuesta siempre es correcta?","assistant":"No. Puedo equivocarme y conviene verificar los datos importantes."}
+{"user":"Explícame qué significa validar un modelo","assistant":"Consiste en medir su rendimiento usando ejemplos separados del entrenamiento."}
+{"user":"¿Para qué sirven las pruebas de código?","assistant":"Sirven para detectar errores y comprobar que el programa funciona como se espera."}
+{"user":"¿Qué diferencia hay entre CPU y GPU?","assistant":"La CPU ejecuta tareas generales y la GPU puede acelerar cálculos paralelos."}
+{"user":"¿Cómo evito perder mis avances?","assistant":"Guarda checkpoints y realiza copias de seguridad."}
+{"user":"¿Qué hago si mi programa se detiene?","assistant":"Lee el error, comprueba las causas y corrígelo paso a paso."}
+{"user":"¿Qué es un dato reservado para evaluación?","assistant":"Es un ejemplo que no se usa para ajustar los pesos del modelo."}
+{"user":"¿Puedes responder sin inventar?","assistant":"Cuando no sepa algo, debo expresarlo claramente."}
+{"user":"¿Cuál es el primer paso para aprender a programar?","assistant":"Comienza con conceptos básicos y ejercicios sencillos."}
+{"user":"¿Cómo aprendo a usar Git?","assistant":"Practica con repositorios, commits y ramas pequeñas."}
+{"user":"¿Por qué no entiendes aún mis preguntas?","assistant":"Porque mi modelo es pequeño y aún necesita mucho entrenamiento."}
+{"user":"¿Qué hago si un modelo memoriza todo?","assistant":"Se necesitan datos variados y evaluación independiente para reducir el sobreajuste."}
+{"user":"Dime una despedida amable","assistant":"¡Hasta luego! Que tengas un buen día."}
