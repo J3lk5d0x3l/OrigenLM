@@ -93,10 +93,13 @@ class PresupuestoTests(unittest.TestCase):
     def test_amplia_calendario_si_se_pide_mas(self):
         self.assertEqual(t.planificar_pasos(500, 3000, None, 3000), (3500, 3500))
 
-    def test_total_explicito_manda(self):
-        self.assertEqual(t.planificar_pasos(500, 10, 2000, 3000), (2000, 2000))
+    def test_total_explicito_es_horizonte_no_obligacion(self):
+        self.assertEqual(t.planificar_pasos(500, 10, 2000, 3000), (510, 2000))
         with self.assertRaises(ValueError):
             t.planificar_pasos(500, 10, 400)
+
+    def test_no_pasa_del_horizonte(self):
+        self.assertEqual(t.planificar_pasos(500, 5000, 3000, None), (3000, 3000))
 
 
 class CompatibilidadTests(unittest.TestCase):

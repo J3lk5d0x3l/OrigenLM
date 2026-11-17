@@ -66,5 +66,5 @@ kaggle datasets create -p dist/checkpoint --dir-mode zip
 Misma celda de entrenamiento: `--resume` continúa desde el paso guardado. El
 calendario del coseno se conserva porque el total vive en el checkpoint
 (`total_steps`). Si quieres alargar el entrenamiento, usa
-`--pasos-total 12000` (o el horizonte que decidas): la curva se estira, pero el
-warmup **no** se reinicia.
+`--pasos-total 12000`: fija el horizonte de la curva (no obliga a entrenar hasta
+él, eso lo decide `--pasos`), y el warmup **no** se reinicia.

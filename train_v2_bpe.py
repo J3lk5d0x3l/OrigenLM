@@ -56,20 +56,20 @@ def planificar_pasos(desde: int, pasos: int, total_explicito: int | None = None,
                      total_guardado: int | None = None) -> tuple[int, int]:
     """Devuelve (paso final de esta ejecución, total del calendario del coseno).
 
-    - `--pasos` son pasos NUEVOS a ejecutar ahora (o el total si se empieza).
-    - `--pasos-total` fija el horizonte del calendario y se ejecuta hasta él.
+    - `--pasos` son los pasos NUEVOS a ejecutar ahora.
+    - `--pasos-total` es el horizonte del coseno: no obliga a entrenar hasta él.
     - Al reanudar se conserva el total guardado si es mayor, para no acortar
-      la curva del coseno, pero la ejecución termina donde se pidió.
+      la curva; si el checkpoint es antiguo y no lo trae, hay que indicarlo.
     """
     if desde < 0 or pasos < 1:
         raise ValueError("El número de pasos debe ser positivo")
+    solicitado = desde + pasos
     if total_explicito is not None:
         if total_explicito <= desde:
             raise ValueError(
                 f"--pasos-total ({total_explicito}) debe superar el paso guardado ({desde})")
-        return total_explicito, total_explicito
-    final = desde + pasos
-    return final, max(final, total_guardado or 0)
+        return min(solicitado, total_explicito), total_explicito
+    return solicitado, max(solicitado, total_guardado or 0)
 
 
 def huella_sha256(ruta: Path) -> str:
@@ -425,6 +425,9 @@ def main(argv: list[str] | None = None) -> int:
           f"({fin - inicio_paso:,} nuevos, "
           f"{(fin - inicio_paso) * tokens_paso / 1e6:.1f}M tokens) | "
           f"calendario del coseno hasta {total:,}")
+    if inicio_paso and args.pasos_total is None and not (previo or {}).get("total_steps"):
+        print("[aviso] El checkpoint no guardó el horizonte del coseno: "
+              "usa --pasos-total para conservar la curva de LR.")
     if previo:
         print(f"reanudado desde {args.resume} | tokens previos {tokens_previos:,} | "
               f"val {ultima_val if ultima_val is None else round(float(ultima_val), 4)}")
@@ -499,7 +502,7 @@ def main(argv: list[str] | None = None) -> int:
             optimizador.zero_grad(set_to_none=True)
             perdida_total = 0.0
             for _ in range(args.grad_accum):
-                x, y = muestrear(train, args.ctx, args.batch_size, gen)
+                x, y = train.lote(args.ctx, args.batch_size, gen)
                 if dispositivo.type == "cuda":
                     x = x.pin_memory()
                     y = y.pin_memory()
