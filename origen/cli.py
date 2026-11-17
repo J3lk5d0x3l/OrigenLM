@@ -10,6 +10,8 @@ from .resources import effective_cpu_count, memory_limit_bytes
 ROOT = Path(__file__).resolve().parents[1]
 CHECKPOINT_V2 = ROOT / "checkpoints/origen_v2_latest.pt"
 CHECKPOINT_V1 = ROOT / "checkpoints/origen_latest.pt"
+# Comandos del agente (modelos abiertos + herramientas + MCP); no necesitan PyTorch.
+COMANDOS_AGENTE = ("agente", "preguntar", "modelos", "herramientas", "doctor")
 
 
 def chosen_chat(v1: Path = CHECKPOINT_V1, v2: Path = CHECKPOINT_V2) -> str | None:
@@ -39,7 +41,8 @@ def show_status() -> int:
         with data.open(encoding="utf-8") as source:
             count = sum(bool(row.strip()) for row in source)
         print(f"Datos conversacionales: {count} ejemplos (demostración)")
-    print("Iniciar conversación: origen")
+    print("Agente con modelos abiertos: origen doctor  |  origen agente")
+    print("Iniciar conversación con checkpoint propio: origen")
     print("Entrenamiento explícito: origen entrenar --steps 1000")
     return 0
 
@@ -53,6 +56,14 @@ def main(argv: list[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     if args and args[0] in ("-h", "--help", "ayuda", "help"):
         print("""Comando OrigenLM
+Agente (modelos abiertos + herramientas + internet + MCP):
+  origen doctor              Diagnosticar el entorno (Ollama, modelo, MCP)
+  origen modelos             Ver modelos instalados y sugeridos (--instalar ETIQUETA)
+  origen agente [-m MODELO]  Chat interactivo con herramientas (/ayuda dentro del chat)
+  origen preguntar "texto"   Una pregunta y respuesta
+  origen herramientas        Listar herramientas integradas y de servidores MCP
+
+Modelo propio entrenado desde cero:
   origen                     Abrir chat con mejor checkpoint disponible (v2 o v1)
   origen estado              Inspeccionar recursos del Codespace y checkpoints
   origen v1                  Abrir chat del modelo clásico
@@ -63,6 +74,9 @@ def main(argv: list[str] | None = None) -> int:
   origen --help              Mostrar ayuda
 """)
         return 0
+    if args and args[0] in COMANDOS_AGENTE:
+        from .agente.cli import main as agente_main
+        return agente_main(args)
     if args and args[0] == "estado":
         return show_status()
     if args and args[0] == "pruebas":
@@ -83,7 +97,8 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     script = chosen_chat()
     if script is None:
-        print("No existe un checkpoint entrenado; usa origen estado", file=sys.stderr)
+        print("No existe un checkpoint entrenado propio. Para conversar con un modelo abierto usa: "
+              "origen doctor  y  origen agente", file=sys.stderr)
         return 2
     if script == "chat.py":
         print("OrigenLM: no hay checkpoint v2; abriendo la versión v1.", flush=True)

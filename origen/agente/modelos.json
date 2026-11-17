@@ -1,0 +1,14 @@
+{
+  "aviso": "Pesos aproximados (descarga cuantizada en Ollama). Verifica etiquetas y tamaños en https://ollama.com/library",
+  "modelos": [
+    {"id": "qwen2.5:1.5b", "familia": "Qwen 2.5", "peso_gb": 1.0, "herramientas": true, "notas": "Muy rápido; razona poco"},
+    {"id": "llama3.2:1b", "familia": "Llama 3.2", "peso_gb": 1.3, "herramientas": true, "notas": "Muy limitado; solo para pruebas"},
+    {"id": "qwen2.5:3b", "familia": "Qwen 2.5", "peso_gb": 1.9, "herramientas": true, "notas": "Buen punto de partida en CPU"},
+    {"id": "llama3.2:3b", "familia": "Llama 3.2", "peso_gb": 2.0, "herramientas": true, "notas": "Alternativa de 3B"},
+    {"id": "qwen3:4b", "familia": "Qwen 3", "peso_gb": 2.5, "herramientas": true, "notas": "Razona; más lento por pensar antes de responder"},
+    {"id": "qwen2.5:7b", "familia": "Qwen 2.5", "peso_gb": 4.7, "herramientas": true, "notas": "Mejor uso de herramientas; lento en CPU"},
+    {"id": "llama3.1:8b", "familia": "Llama 3.1", "peso_gb": 4.9, "herramientas": true, "notas": "Equilibrado; lento en CPU"},
+    {"id": "qwen3:8b", "familia": "Qwen 3", "peso_gb": 5.2, "herramientas": true, "notas": "Razona; lento en CPU"},
+    {"id": "qwen2.5:14b", "familia": "Qwen 2.5", "peso_gb": 9.0, "herramientas": true, "notas": "Muy lento en 4 núcleos"}
+  ]
+}
