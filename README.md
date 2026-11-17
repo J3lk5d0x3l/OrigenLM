@@ -178,3 +178,19 @@ El contexto del checkpoint nuevo es de 384 bytes (no palabras).
 **Limitación:** 133 conversaciones siguen siendo insuficientes para una IA
 general. Esta etapa busca verificar que OrigenLM aprenda el formato pregunta →
 respuesta. Una pérdida baja en 15 ejemplos no demuestra comprensión general.
+
+
+## OrigenLM-Mythos (nueva línea experimental)
+
+Se añadió `origen/mythos.py`: un segundo Transformer original,
+con Grouped Query Attention y arquitectura configurable. **No es Claude
+Mythos**, ni utiliza sus pesos: los checkpoints se generan desde cero.
+Es independiente de OrigenLM-300.
+
+```bash
+python train_mythos.py --preset micro --steps 10 --output checkpoints/mythos_micro.pt
+python chat_mythos.py --checkpoint checkpoints/mythos_micro.pt
+```
+
+Guía completa de presets y configuración para Camber:
+[docs/MYTHOS.md](docs/MYTHOS.md).
