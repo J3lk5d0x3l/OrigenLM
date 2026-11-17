@@ -13,7 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def execute(command):
-    print("\n[OrigenLM] Ejecutando:", " ".join(map(str, command)), flush=True)
+    print("
+[OrigenLM] Ejecutando:", " ".join(map(str, command)), flush=True)
     subprocess.run(command, cwd=ROOT, check=True)
 
 
@@ -26,11 +27,11 @@ def main():
     parser.add_argument("--grad-accum", type=int, default=4)
     parser.add_argument("--no-download", action="store_true",
                         help="Usa únicamente archivos locales ya presentes")
-    parser.add_argument("--no-chat", action="store_true",
+    parser.add_argument("--sft-steps", type=int, default=500,\n                        help="Ajuste conversacional final con datos propios (0=desactivar)")\n    parser.add_argument("--no-chat", action="store_true",
                         help="No reabrir el chat después del entrenamiento")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
-    if args.steps <= 0 or args.seq_len <= 0 or args.max_minutes <= 0:
+    if args.steps <= 0 or args.seq_len <= 0 or args.max_minutes <= 0 or args.sft_steps < 0:
         parser.error("Pasos, contexto y tiempo deben ser positivos")
     sources = ROOT / "dataset/fuentes"
     prepared = ROOT / "dataset/preparado/meta.json"
@@ -47,6 +48,15 @@ def main():
         "--batch-size", str(args.batch_size),
         "--grad-accum", str(args.grad_accum),
     ])
+    if args.sft_steps:
+        commands.append([
+            sys.executable, "train_respuestas.py",
+            "--resume", "checkpoints/origen_masivo.pt",
+            "--output", "checkpoints/origen_ajustado.pt",
+            "--steps", str(args.sft_steps),
+            "--save-every", str(min(100, args.sft_steps)),
+            "--context", str(max(384, args.seq_len)),
+        ])
     if args.dry_run:
         for command in commands:
             print("PLAN:", " ".join(command))
@@ -57,7 +67,7 @@ def main():
         except subprocess.CalledProcessError as exc:
             print(f"[OrigenLM] El proceso terminó con error ({exc.returncode}); se conservan los checkpoints.", file=sys.stderr)
             return exc.returncode or 1
-    result = ROOT / "checkpoints/origen_masivo.pt"
+    result = ROOT / ("checkpoints/origen_ajustado.pt" if args.sft_steps else "checkpoints/origen_masivo.pt")
     if not result.is_file():
         print("[OrigenLM] No se generó checkpoint de entrenamiento.", file=sys.stderr)
         return 2
