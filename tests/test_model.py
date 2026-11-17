@@ -13,10 +13,10 @@ class OrigenTests(unittest.TestCase):
     def test_malformed_terminal_input_does_not_crash(self):
         # An invalid UTF-8 byte read with surrogateescape can become U+DCC2.
         # Accented characters and emoji must remain intact.
-        broken = "Hola, ¿en qué puedo ayudarte? 🐍\\udcc2"
+        broken = "Hola, ¿en qué puedo ayudarte? 🐍\udcc2"
         self.assertEqual(decode(encode(broken)), "Hola, ¿en qué puedo ayudarte? 🐍?")
         self.assertEqual(decode(encode("Español café 🐍")), "Español café 🐍")
-        self.assertEqual(decode(encode("a\\ud800b")), "a?b")
+        self.assertEqual(decode(encode("a\ud800b")), "a?b")
         self.assertEqual(conversation_prefix("sistema", [("Hola", "¡Buenas!")], broken)[-1], 260)
 
     def test_forward_and_backprop(self):
