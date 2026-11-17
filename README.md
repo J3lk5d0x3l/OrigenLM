@@ -140,3 +140,41 @@ Esto no agrega respuestas predefinidas ni convierte el modelo pequeño en un
 asistente útil. Para avances reales harán falta muchos más datos originales,
 mejor entrenamiento orientado a conversaciones, evaluación cualitativa y un
 modelo con una ventana de contexto mucho mayor.
+
+## Etapa 4 — entrenamiento supervisado de respuestas (experimental)
+
+La comparación de los checkpoints 200 y 300 mostró texto poco coherente. El
+entrenamiento antiguo elegía fragmentos aleatorios de un flujo concatenado y
+supervisaba instrucciones, preguntas y respuestas por igual, a veces sin
+mostrarle al modelo la conversación completa. Para evitarlo, la etapa 4:
+
+- Aísla cada conversación de entrenamiento.
+- Calcula la pérdida **solo en bytes de respuesta del asistente y EOS**.
+- Amplía el contexto a 384 bytes/tokens (RoPE no tiene posiciones aprendidas).
+- Verifica que preguntas de entrenamiento y validación no se repitan.
+- Crea un checkpoint *nuevo*; conserva los pesos y los respaldos existentes.
+
+Antes de entrenar, mide la pérdida de RESPUESTAS en el checkpoint de 300 pasos:
+
+```bash
+python -m scripts.evaluar_respuestas --checkpoint /workspaces/backup-origenlm/origen_300_pasos.pt
+```
+
+Para un experimento de 100 pasos adicionales desde OrigenLM-300:
+
+```bash
+python train_respuestas.py --resume checkpoints/origen_latest.pt --steps 100
+python -m scripts.evaluar_respuestas --checkpoint checkpoints/origen_respuestas.pt
+python chat.py --checkpoint checkpoints/origen_respuestas.pt --seed 42
+```
+
+El entrenador escribe **solo** `checkpoints/origen_respuestas.pt`, no
+`checkpoints/origen_latest.pt`. El optimizador se reinicia si se
+importan pesos de la etapa anterior porque el objetivo es distinto. Si luego
+quieres continuar la etapa 4, usa `--resume checkpoints/origen_respuestas.pt`
+con otro destino de salida para no sobrescribir accidentalmente el archivo fuente.
+El contexto del checkpoint nuevo es de 384 bytes (no palabras).
+
+**Limitación:** 133 conversaciones siguen siendo insuficientes para una IA
+general. Esta etapa busca verificar que OrigenLM aprenda el formato pregunta →
+respuesta. Una pérdida baja en 15 ejemplos no demuestra comprensión general.
