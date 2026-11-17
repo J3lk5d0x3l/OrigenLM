@@ -43,7 +43,7 @@ def main() -> None:
         parser.error("max-new-tokens y temperature deben ser positivos")
     for path in [args.a, args.b]:
         model, checkpoint = load_checkpoint(path)
-        print(f"\\n=== {path.name} | paso {checkpoint['step']} ===")
+        print(f"\n=== {path.name} | paso {checkpoint['step']} ===")
         for question in prompts:
             prefix = conversation_prefix_limited(
                 DEFAULT_SYSTEM, [], question, model.config.max_seq_len
@@ -54,7 +54,7 @@ def main() -> None:
             ).strip()
             print(f"Tú: {question}")
             print(f"Origen: {response or '[Sin texto generado]'}")
-    print("\\nComparación cualitativa; no mide comprensión ni garantiza mejoras.")
+    print("\nComparación cualitativa; no mide comprensión ni garantiza mejoras.")
 
 
 if __name__ == "__main__":
