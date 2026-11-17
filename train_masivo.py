@@ -83,7 +83,7 @@ def main():
     p.add_argument("--grad-accum", type=int, default=4)
     p.add_argument("--lr", type=float, default=0.0002)
     p.add_argument("--save-every", type=int, default=250)
-    p.add_argument("--eval-batches", type=int, default=10)
+    p.add_argument("--eval-batches", type=int, default=24)
     p.add_argument("--max-minutes", type=float, default=180, help="Guardar y parar tras este tiempo real")
     p.add_argument("--seed", type=int, default=42)
     args = p.parse_args()
@@ -117,19 +117,19 @@ def main():
         group["lr"] = args.lr
     step0 = int(saved.get("step", 0))
     training_rng = random.Random(args.seed + step0)
-    validation_rng = random.Random(9999)
     began = time.monotonic()
     print(f"OrigenLM propio | CPU threads={threads} | parámetros={model.count_parameters():,}", flush=True)
     print(f"Checkpoint base: {continue_from} paso={step0}", flush=True)
     print(f"Corpus: {meta['total_documents']} documentos | {meta['total_tokens']:,} tokens", flush=True)
     print(f"Entrenamiento: batch={args.batch_size} x acumulación={args.grad_accum}, contexto={args.seq_len}", flush=True)
-    initial_val = evaluate(model, shards["val"], args.seq_len, args.eval_batches, validation_rng, device)
+    initial_val = evaluate(model, shards["val"], args.seq_len, args.eval_batches, random.Random(9999), device)
+    print(f"Validación fija: {args.eval_batches} ventanas idénticas en cada evaluación (seed 9999)", flush=True)
     print(f"Validación inicial NLL={initial_val:.4f}", flush=True)
     tokens_since = 0
     last_log = time.monotonic()
 
     def save(step: int, train_loss: float):
-        val_loss = evaluate(model, shards["val"], args.seq_len, args.eval_batches, validation_rng, device)
+        val_loss = evaluate(model, shards["val"], args.seq_len, args.eval_batches, random.Random(9999), device)
         payload = {"architecture": "origen-v1", "config": asdict(config), "step": step,
                    "model": model.state_dict(), "optimizer": opt.state_dict(),
                    "train_loss": train_loss, "val_loss": val_loss,

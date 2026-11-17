@@ -46,6 +46,7 @@ def show_status() -> int:
     print("Agente con pesos propios y MCP: origen doctor  |  origen agente")
     print("Iniciar conversación con checkpoint propio: origen")
     print("Continuar pesos propios: origen entrenar-masivo --steps 20000")
+    print("Comparar configuraciones CPU: origen benchmark")
     return 0
 
 
@@ -65,6 +66,7 @@ def main(argv: list[str] | None = None) -> int:
   origen doctor                    Diagnosticar recursos y checkpoint
   origen entrenar-masivo           Descargar corpus autorizado y entrenar pesos ORIGINALES
   origen entrenar-masivo --dry-run  Ver el plan sin ejecutarlo
+  origen benchmark                 Medir rendimiento de hilos y lotes sin tocar pesos
   origen entrenar --steps 1000     Crear modelo v2 desde cero (opcional)
   origen estado                    Estado de recursos, corpus y pesos
   origen v1 | origen v2            Elegir un checkpoint histórico
@@ -79,6 +81,9 @@ def main(argv: list[str] | None = None) -> int:
         return show_status()
     if args and args[0] == "pruebas":
         return subprocess.call([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"], cwd=ROOT)
+    if args and args[0] == "benchmark":
+        os.chdir(ROOT)
+        return subprocess.call([sys.executable, "-m", "scripts.benchmark_cpu", *args[1:]])
     if args and args[0] == "entrenar-masivo":
         exec_project_script("scripts/entrenamiento_masivo.py", args[1:])
     if args and args[0] == "entrenar":

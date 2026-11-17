@@ -280,3 +280,28 @@ y necesitará entrenamiento nuevo desde cero.
 Para evitar filtración y gastos, `dataset/fuentes/`, `dataset/preparado/` y
 sus metadatos se ignoran por Git. No subir corpora ni claves. Fuentes nuevas
 deben tener licencia verificada y derechos de entrenamiento.
+
+## Medir y mejorar velocidad de Codespaces sin interrumpir el entrenamiento
+
+Mientras un proceso entrena, **no lanzar el benchmark en paralelo**: ambos
+competirían por las mismas cuatro CPU y medirían resultados engañosos.
+
+Después de que finalice la sesión, ejecutar una vez:
+
+```bash
+origen benchmark
+```
+
+Este comando crea modelos temporales **en memoria**, utiliza tokens sintéticos
+y compara hilos 1/2/4 y microbatches con la misma cantidad de tokens
+supervisados por paso. No modifica checkpoints ni crea modelos externos.
+
+Para la siguiente sesión usar la combinación más rápida medida, si ofrece una
+mejora repetible. El entrenador también usa ahora **ventanas de validación
+deterministas** (24 lotes fijos) para que el NLL entre pasos sea comparable;
+los nuevos valores no son directamente equivalentes a la validación aleatoria
+de ejecuciones anteriores. No se modifica un proceso que ya está ejecutándose.
+
+Se recomienda no aumentar artificialmente las CPU/hilos ni reducir el número
+de documentos: la métrica importante es rendimiento **con la misma calidad**
+de validación, no únicamente pérdida de entrenamiento.
