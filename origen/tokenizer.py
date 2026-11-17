@@ -39,7 +39,7 @@ def training_example(item: dict) -> list[int]:
     if not all(key in item for key in ("user", "assistant")):
         raise ValueError("Record needs 'text' or both 'user' and 'assistant'.")
     return [
-        BOS, SYSTEM, *encode(str(item.get("system", DEFAULT_SYSTEM)), END,
+        BOS, SYSTEM, *encode(str(item.get("system", DEFAULT_SYSTEM))), END,
         USER, *encode(str(item["user"])), END,
         ASSISTANT, *encode(str(item["assistant"])), EOS,
     ]
@@ -51,6 +51,7 @@ def conversation_prefix(system: str, history: list[tuple[str, str]], user: str) 
         ids += [USER, *encode(question), END, ASSISTANT, *encode(answer), END]
     ids += [USER, *encode(user), END, ASSISTANT]
     return ids
+
 
 def conversation_prefix_limited(
     system: str, history: list[tuple[str, str]], user: str, max_seq_len: int
