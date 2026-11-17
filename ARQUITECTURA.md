@@ -1,26 +1,32 @@
 # Arquitectura de OrigenLM
 
-Modelo Transformer autoregresivo (decoder-only) entrenado desde pesos aleatorios.
-No utiliza pesos de Claude, GPT, Llama, Qwen ni modelos comerciales.
+OrigenLM es un proyecto experimental de entrenamiento desde cero. La implementación usa técnicas publicadas de redes Transformer y no incorpora pesos externos.
 
-## Componentes
-- tokenizer propio UTF-8 con 256 tokens byte y seis tokens de control.
-- embeddings entrenables, RMSNorm, atención causal con RoPE y SwiGLU.
-- entrenamiento con AdamW, clipping de gradientes, checkpoints recuperables.
-- interfaz conversacional por terminal, pruebas automatizadas.
+## V1: referencia entrenada
 
-## Limitaciones actuales
-- Contexto de apenas 96 tokens byte en el preset inicial.
-- Datos demostrativos escasos, incapaces de generar una IA conversacional útil.
-- Sin evaluación formal, alineación, herramientas, memoria externa ni KV-cache.
-- El entrenamiento incluido es una prueba funcional, no un LLM de nivel Claude.
+- Arquitectura decoder-only con atención causal, RoPE, RMSNorm y SwiGLU.
+- Tokenizador UTF-8 por bytes: 256 valores y seis tokens de control.
+- Configuración de la primera generación: 357.600 parámetros.
+- Preentrenamiento causal con corpus separado por documentos; ajuste de respuestas posterior.
+- El ajuste final fue registrado en el paso 20.800, pero la evaluación de conversación sigue mostrando errores importantes.
+- Los checkpoints son locales y están ignorados por Git. El repositorio NO contiene los pesos.
 
-## Próximas fases
-1. Recopilar datos propios y con licencias compatibles.
-2. Implementar BPE y contexto largo.
-3. Entrenamiento medido con evaluación separada y GPUs si procede.
-4. Supervisión conversacional, pruebas de seguridad y razonamiento.
-5. API y aplicación local, herramientas con permisos y almacenamiento de checkpoints.
+## V2: trabajo en curso
 
-El checkpoint de ejemplo del ZIP no se sube a GitHub porque .gitignore
-excluye archivos .pt; los nuevos pesos se generan en Codespaces al entrenar.
+- `origen/v2.py`: arquitectura propia con atención agrupada (GQA), RoPE, SwiGLU y KV-cache para inferencia.
+- `origen/tokenizer_v2.py`: tokenizador BPE que aprende un vocabulario desde datos autorizados.
+- `scripts/preparar_v2.py`: crea un corpus V2 propio, sin reutilizar vocabularios externos, manteniendo los splits train/val.
+- **Pendiente:** conectar de forma segura el vocabulario BPE con el preentrenador V2, generar checkpoints con identidad de tokenizador y ejecutar evaluación independiente.
+- `train_origen_v2.py` aún usa la vía experimental de entrenamiento conversacional con el tokenizador por bytes. No debe presentarse como entrenamiento BPE completo.
+
+Cambiar el vocabulario o el tamaño de arquitectura impide cargar directamente los pesos de V1 en V2.
+
+## Datos, experimentos y seguridad
+
+1. Usar exclusivamente datos propios o reutilizables con permiso, registrando fuente y licencia.
+2. Separar datos de entrenamiento, validación y prueba **antes** de entrenar el tokenizador.
+3. Guardar checkpoints fuera del control de versiones; respaldar los pesos fuera de Codespaces.
+4. Evaluar precisión y coherencia, además de la NLL. Una menor NLL no demuestra razonamiento.
+5. Mantener herramientas externas tras permisos explícitos y controles de seguridad.
+
+Los detalles de instalación y pruebas están en [docs/DESARROLLO.md](docs/DESARROLLO.md).
