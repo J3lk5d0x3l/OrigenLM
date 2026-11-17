@@ -17,11 +17,12 @@ dist/
 # Corpus grandes y archivos privados que NO deben versionarse
 dataset/fuentes/
 dataset/preparado/
+dataset/fuentes_es/
+dataset/preparado_v2/
+dataset/preparado_v2_es/
 dataset/fuentes_procedencia.json
 dataset/correcciones_locales.jsonl
 conversaciones/
-
-dataset/preparado_v2/
 
 # Otros artefactos entrenados y secretos locales
 *.pth

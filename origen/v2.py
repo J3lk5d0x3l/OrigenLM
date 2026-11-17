@@ -25,8 +25,9 @@ class OrigenV2Config:
     norm_eps: float = 1e-6
 
     def validate(self):
-        if self.vocab_size != VOCAB_SIZE:
-            raise ValueError(f"El tokenizador requiere vocab_size={VOCAB_SIZE}")
+        if self.vocab_size < VOCAB_SIZE:
+            raise ValueError(
+                f"vocab_size debe ser al menos {VOCAB_SIZE} (tokenizador de bytes de V1)")
         values = (self.dim, self.n_layers, self.n_heads, self.n_kv_heads,
                   self.hidden_dim, self.max_seq_len)
         if min(values) <= 0 or self.norm_eps <= 0:
@@ -274,7 +275,8 @@ class OrigenV2(nn.Module):
     @torch.inference_mode()
     def generate(self, prefix: list[int], max_new_tokens: int = 160,
                  temperature: float = 0.8, top_k: int = 40,
-                 use_cache: bool = True) -> list[int]:
+                 use_cache: bool = True,
+                 stop_ids: tuple[int, ...] | None = None) -> list[int]:
         """Genera tokens nuevos reutilizando las claves/valores ya calculados.
 
         Sin cache el prefijo se reprocesaba en cada token (coste cuadrático).
@@ -289,6 +291,7 @@ class OrigenV2(nn.Module):
         window = self.config.max_seq_len
         generated = list(prefix)
         self.eval()
+        detener = set(stop_ids) if stop_ids else {EOS, END}
 
         def choose(next_logits: torch.Tensor) -> int:
             next_logits = next_logits.float()
@@ -305,7 +308,7 @@ class OrigenV2(nn.Module):
                 tokens = torch.tensor([generated[-window:]], dtype=torch.long, device=device)
                 logits, _ = self(tokens)
                 new_token = choose(logits[0, -1])
-                if new_token in (EOS, END):
+                if new_token in detener:
                     break
                 generated.append(new_token)
             return generated[len(prefix):]
@@ -315,7 +318,7 @@ class OrigenV2(nn.Module):
         logits, _ = self(tokens, caches=caches)
         for _ in range(max_new_tokens):
             new_token = choose(logits[0, -1])
-            if new_token in (EOS, END):
+            if new_token in detener:
                 break
             generated.append(new_token)
             if caches[0].length >= window:
