@@ -98,7 +98,7 @@ siendo experimental y el contexto del modelo tiny actual es de solo 96 bytes.
 Primero mide el checkpoint existente (no altera sus pesos):
 
 ```bash
-python scripts/evaluar_checkpoint.py
+python -m scripts.evaluar_checkpoint
 ```
 
 Para un **experimento posterior**, realiza una copia del checkpoint y entrena
@@ -109,7 +109,7 @@ con el dataset ampliado. El comando original por defecto sigue usando
 mkdir -p /workspaces/backup-origenlm
 cp checkpoints/origen_latest.pt /workspaces/backup-origenlm/origen_200_pasos.pt
 python train.py --resume checkpoints/origen_latest.pt --data dataset/chat_v2.jsonl --steps 100 --batch-size 2 --seq-len 96
-python scripts/evaluar_checkpoint.py
+python -m scripts.evaluar_checkpoint
 ```
 
 No compares directamente la pérdida de entrenamiento con la de evaluación:
