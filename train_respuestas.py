@@ -12,6 +12,7 @@ import torch
 
 from origen.chat_training import batchify, prepare_records, read_chat_dataset, response_nll
 from origen.model import ModelConfig, OrigenLM, PRESETS
+from origen.resources import configure_cpu_threads
 
 
 def main():
@@ -37,6 +38,7 @@ def main():
         parser.error(f"No existe el checkpoint: {args.resume}")
 
     torch.manual_seed(args.seed)
+    configure_cpu_threads("train")
     rng = random.Random(args.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     saved = torch.load(args.resume, map_location="cpu", weights_only=True)
