@@ -27,7 +27,9 @@ def main():
     parser.add_argument("--grad-accum", type=int, default=4)
     parser.add_argument("--no-download", action="store_true",
                         help="Usa únicamente archivos locales ya presentes")
-    parser.add_argument("--sft-steps", type=int, default=500,\n                        help="Ajuste conversacional final con datos propios (0=desactivar)")\n    parser.add_argument("--no-chat", action="store_true",
+    parser.add_argument("--sft-steps", type=int, default=500,
+                        help="Ajuste conversacional final con datos propios (0=desactivar)")
+    parser.add_argument("--no-chat", action="store_true",
                         help="No reabrir el chat después del entrenamiento")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
