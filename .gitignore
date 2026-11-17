@@ -11,4 +11,5 @@ checkpoints/*.pt
 .env
 .env.*
 !.env.example
-# Local transfer bundles - do not commit exported data\ndist/\n
+# Local transfer bundles - do not commit exported data
+dist/

@@ -34,10 +34,10 @@ La documentación de conexión segura por OAuth, empaquetado del proyecto y diag
 está en [docs/CAMBER.md](docs/CAMBER.md). La autorización y el despliegue requieren
 que el propietario de la cuenta complete el inicio de sesión en Camber.
 
-\`\`\`bash
+```bash
 python3 scripts/diagnostico_entorno.py
 python3 scripts/preparar_camber.py
-\`\`\`
+```
 
 ## Ejecutar en tu PC
 
