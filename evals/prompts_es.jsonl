@@ -1,0 +1,20 @@
+{"id": "es-01", "categoria": "espanol", "prompt": "Explica en una frase qué es el agua.", "comprobar": {"tipo": "min_palabras", "valor": 5}}
+{"id": "es-02", "categoria": "espanol", "prompt": "Escribe una oración sobre Bogotá.", "comprobar": {"tipo": "contiene", "valores": ["bogot"]}}
+{"id": "es-03", "categoria": "espanol", "prompt": "¿Qué es un perro? Responde en una frase.", "comprobar": {"tipo": "min_palabras", "valor": 5}}
+{"id": "es-04", "categoria": "espanol", "prompt": "Completa la frase: El sol sale por el", "comprobar": {"tipo": "contiene", "valores": ["este"]}}
+{"id": "es-05", "categoria": "espanol", "prompt": "Nombra tres animales en español, separados por comas.", "comprobar": {"tipo": "min_palabras", "valor": 3}}
+{"id": "es-06", "categoria": "espanol", "prompt": "¿Para qué sirve una brújula? Responde en una frase.", "comprobar": {"tipo": "min_palabras", "valor": 5}}
+{"id": "es-07", "categoria": "espanol", "prompt": "Escribe una pregunta en español que termine en signo de interrogación.", "comprobar": {"tipo": "contiene", "valores": ["?"]}}
+{"id": "es-08", "categoria": "espanol", "prompt": "Saluda en español en una sola frase.", "comprobar": {"tipo": "min_palabras", "valor": 2}}
+{"id": "mat-01", "categoria": "matematicas", "prompt": "¿Cuánto es 7 + 5?", "comprobar": {"tipo": "numero", "valor": 12}}
+{"id": "mat-02", "categoria": "matematicas", "prompt": "¿Cuánto es 23 - 8?", "comprobar": {"tipo": "numero", "valor": 15}}
+{"id": "mat-03", "categoria": "matematicas", "prompt": "¿Cuánto es 6 * 7?", "comprobar": {"tipo": "numero", "valor": 42}}
+{"id": "mat-04", "categoria": "matematicas", "prompt": "¿Cuánto es 100 / 4?", "comprobar": {"tipo": "numero", "valor": 25}}
+{"id": "ins-01", "categoria": "instrucciones", "prompt": "Responde solo con la palabra: listo", "comprobar": {"tipo": "contiene", "valores": ["listo"]}}
+{"id": "ins-02", "categoria": "instrucciones", "prompt": "Repite exactamente: hola mundo", "comprobar": {"tipo": "contiene", "valores": ["hola mundo"]}}
+{"id": "ins-03", "categoria": "instrucciones", "prompt": "Escribe tres palabras separadas por comas: sol, mar, cielo", "comprobar": {"tipo": "contiene", "valores": ["sol", "mar", "cielo"]}}
+{"id": "ins-04", "categoria": "instrucciones", "prompt": "Di solo el nombre de la capital de Colombia.", "comprobar": {"tipo": "contiene", "valores": ["bogot"]}}
+{"id": "prog-01", "categoria": "programacion", "prompt": "Escribe una función de Python que sume dos números.", "comprobar": {"tipo": "contiene", "valores": ["def", "return"]}}
+{"id": "prog-02", "categoria": "programacion", "prompt": "¿Qué palabra clave define una función en Python?", "comprobar": {"tipo": "contiene", "valores": ["def"]}}
+{"id": "prog-03", "categoria": "programacion", "prompt": "Escribe un bucle for que imprima los números del 1 al 3.", "comprobar": {"tipo": "contiene", "valores": ["for", "print"]}}
+{"id": "prog-04", "categoria": "programacion", "prompt": "¿Qué tipo de dato es 3.14 en Python?", "comprobar": {"tipo": "contiene", "valores": ["float", "flotante"], "todos": false}}

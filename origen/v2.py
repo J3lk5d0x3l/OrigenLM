@@ -276,12 +276,15 @@ class OrigenV2(nn.Module):
     def generate(self, prefix: list[int], max_new_tokens: int = 160,
                  temperature: float = 0.8, top_k: int = 40,
                  use_cache: bool = True,
-                 stop_ids: tuple[int, ...] | None = None) -> list[int]:
+                 stop_ids: tuple[int, ...] | None = None,
+                 on_token=None) -> list[int]:
         """Genera tokens nuevos reutilizando las claves/valores ya calculados.
 
         Sin cache el prefijo se reprocesaba en cada token (coste cuadrático).
         Con cache solo se evalúa el token nuevo, lo que hace usable el chat en
         CPU. `use_cache=False` conserva la ruta anterior para comparar.
+        `on_token(id)` permite mostrar el texto mientras se genera; no altera
+        en nada la elección de tokens.
         """
         if not prefix:
             raise ValueError("El prompt no puede estar vacío")
@@ -311,6 +314,8 @@ class OrigenV2(nn.Module):
                 if new_token in detener:
                     break
                 generated.append(new_token)
+                if on_token is not None:
+                    on_token(new_token)
             return generated[len(prefix):]
 
         caches = self.new_cache()
@@ -321,6 +326,8 @@ class OrigenV2(nn.Module):
             if new_token in detener:
                 break
             generated.append(new_token)
+            if on_token is not None:
+                on_token(new_token)
             if caches[0].length >= window:
                 # Ventana deslizante: libera la posición más antigua del cache.
                 for cache in caches:

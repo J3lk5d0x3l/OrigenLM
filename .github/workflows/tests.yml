@@ -30,7 +30,7 @@ jobs:
       - name: Verificar sintaxis de lanzadores Bash
         run: bash -n scripts/origen scripts/instalar_origen.sh
       - name: Comprobar sintaxis de la CLI y los scripts
-        run: python -m compileall -q origen scripts chat.py chat_origen_v2.py train.py train_origen_v2.py train_masivo.py train_respuestas.py
+        run: python -m compileall -q origen scripts chat.py chat_origen_v2.py train.py train_origen_v2.py train_masivo.py train_respuestas.py train_v2_bpe.py chat_bpe.py
       - name: Verificar plan sin iniciar descargas ni entrenamiento
         run: python -m scripts.entrenamiento_masivo --dry-run
       - name: Ejecutar pruebas
