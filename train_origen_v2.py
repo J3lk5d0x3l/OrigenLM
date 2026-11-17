@@ -10,7 +10,7 @@ import random
 import torch
 
 from origen.chat_training import batchify, prepare_records, read_chat_dataset, response_nll
-from origen.v2 import ORIGEN_V2_PRESETS, OrigenV2Config, OrigenOrigenV2
+from origen.v2 import ORIGEN_V2_PRESETS, OrigenV2Config, OrigenV2
 
 
 def main():
@@ -20,7 +20,7 @@ def main():
     parser.add_argument("--data", type=Path, default=Path("dataset/chat_v2.jsonl"))
     parser.add_argument("--validation", type=Path, default=Path("dataset/evaluacion_v2.jsonl"))
     parser.add_argument("--output", type=Path, default=Path("checkpoints/origen_v2_latest.pt"))
-    parser.add_argument("--resume", type=Path, help="Checkpoint OrigenV2 anterior")
+    parser.add_argument("--resume", type=Path, help="Checkpoint OrigenLM v2 anterior")
     parser.add_argument("--steps", type=int, default=1000, help="Pasos adicionales; ejecutar tras benchmark")
     parser.add_argument("--batch-size", type=int, default=2)
     parser.add_argument("--grad-accum", type=int, default=1)
@@ -63,7 +63,7 @@ def main():
     training_samples = prepare_records(training, cfg.max_seq_len)
     validation_samples = prepare_records(validation, cfg.max_seq_len)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = OrigenOrigenV2(cfg).to(device)
+    model = OrigenV2(cfg).to(device)
     if saved:
         model.load_state_dict(saved["model"])
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.01)
