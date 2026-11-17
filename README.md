@@ -180,17 +180,14 @@ general. Esta etapa busca verificar que OrigenLM aprenda el formato pregunta →
 respuesta. Una pérdida baja en 15 ejemplos no demuestra comprensión general.
 
 
-## OrigenLM-Mythos (nueva línea experimental)
+## OrigenLM v2 — arquitectura escalable en Codespaces (CPU)
 
-Se añadió `origen/mythos.py`: un segundo Transformer original,
-con Grouped Query Attention y arquitectura configurable. **No es Claude
-Mythos**, ni utiliza sus pesos: los checkpoints se generan desde cero.
-Es independiente de OrigenLM-300.
+Se ha integrado una arquitectura propia GQA con presets configurables bajo el nombre **OrigenLM v2**, sin modelos ni pesos de terceros. Esta nueva arquitectura está separada del checkpoint histórico de 300 pasos.
 
-```bash
-python train_mythos.py --preset micro --steps 10 --output checkpoints/mythos_micro.pt
-python chat_mythos.py --checkpoint checkpoints/mythos_micro.pt
-```
+- `origen/v2.py`: arquitectura de OrigenLM v2.
+- `train_origen_v2.py` y `chat_origen_v2.py`: entrenamiento e inferencia.
+- `configs/origen_cpu.json`: configuración inicial de referencia (no representa el techo posible de la máquina).
+- `docs/ENCARGO_AGENTE_CODESPACES.md`: especificación de trabajo integral para el agente de programación.
+- `docs/ORIGEN_V2_CODESPACES.md`: guía de la línea v2.
 
-Guía completa de presets y configuración para Camber:
-[docs/MYTHOS.md](docs/MYTHOS.md).
+**Prioridad: GitHub Codespaces CPU.** Camber no se usará salvo una futura decisión explícita. No iniciar entrenamiento grande con las 133 conversaciones de demostración.

@@ -1,4 +1,4 @@
-"""Entrenar OrigenLM-Mythos desde pesos aleatorios; no usa modelos externos."""
+"""Entrenar OrigenLM v2 desde pesos aleatorios; no usa modelos externos."""
 import argparse
 from contextlib import nullcontext
 from dataclasses import asdict
@@ -10,22 +10,22 @@ import random
 import torch
 
 from origen.chat_training import batchify, prepare_records, read_chat_dataset, response_nll
-from origen.mythos import MYTHOS_PRESETS, MythosConfig, OrigenMythos
+from origen.v2 import ORIGEN_V2_PRESETS, OrigenV2Config, OrigenOrigenV2
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Entrenar OrigenLM-Mythos sin pesos preentrenados")
-    parser.add_argument("--preset", choices=MYTHOS_PRESETS, default="micro")
+    parser = argparse.ArgumentParser(description="Entrenar OrigenLM v2 sin pesos preentrenados")
+    parser.add_argument("--preset", choices=ORIGEN_V2_PRESETS, default="student")
     parser.add_argument("--config", type=Path, help="JSON con parámetros propios, en vez del preset")
     parser.add_argument("--data", type=Path, default=Path("dataset/chat_v2.jsonl"))
     parser.add_argument("--validation", type=Path, default=Path("dataset/evaluacion_v2.jsonl"))
-    parser.add_argument("--output", type=Path, default=Path("checkpoints/mythos_latest.pt"))
-    parser.add_argument("--resume", type=Path, help="Checkpoint Mythos anterior")
-    parser.add_argument("--steps", type=int, default=10, help="Pasos adicionales")
+    parser.add_argument("--output", type=Path, default=Path("checkpoints/origen_v2_latest.pt"))
+    parser.add_argument("--resume", type=Path, help="Checkpoint OrigenV2 anterior")
+    parser.add_argument("--steps", type=int, default=1000, help="Pasos adicionales; ejecutar tras benchmark")
     parser.add_argument("--batch-size", type=int, default=2)
     parser.add_argument("--grad-accum", type=int, default=1)
     parser.add_argument("--lr", type=float, default=0.0003)
-    parser.add_argument("--save-every", type=int, default=10)
+    parser.add_argument("--save-every", type=int, default=100)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--overwrite", action="store_true", help="Permitir reemplazar un destino existente")
     args = parser.parse_args()
@@ -43,14 +43,14 @@ def main():
     torch.manual_seed(args.seed)
     if args.resume:
         saved = torch.load(args.resume, map_location="cpu", weights_only=True)
-        if saved.get("architecture") != "origen-mythos-v1":
-            parser.error("El checkpoint no pertenece a OrigenLM-Mythos v1")
-        cfg = MythosConfig(**saved["config"])
+        if saved.get("architecture") != "origen-v2-gqa-v1":
+            parser.error("El checkpoint no pertenece a OrigenLM v2 v1")
+        cfg = OrigenV2Config(**saved["config"])
     elif args.config:
-        cfg = MythosConfig(**json.loads(args.config.read_text(encoding="utf-8")))
+        cfg = OrigenV2Config(**json.loads(args.config.read_text(encoding="utf-8")))
         saved = None
     else:
-        cfg = MythosConfig(**MYTHOS_PRESETS[args.preset])
+        cfg = OrigenV2Config(**ORIGEN_V2_PRESETS[args.preset])
         saved = None
     cfg.validate()
 
@@ -63,7 +63,7 @@ def main():
     training_samples = prepare_records(training, cfg.max_seq_len)
     validation_samples = prepare_records(validation, cfg.max_seq_len)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = OrigenMythos(cfg).to(device)
+    model = OrigenOrigenV2(cfg).to(device)
     if saved:
         model.load_state_dict(saved["model"])
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=0.01)
@@ -74,7 +74,7 @@ def main():
     use_bfloat16 = device.type == "cuda" and torch.cuda.is_bf16_supported()
     precision = torch.autocast(device_type="cuda", dtype=torch.bfloat16) if use_bfloat16 else nullcontext()
 
-    print(f"OrigenLM-Mythos | dispositivo={device} | parámetros={model.count_parameters():,}")
+    print(f"OrigenLM v2 | dispositivo={device} | parámetros={model.count_parameters():,}")
     print(f"Ventana de contexto: {cfg.max_seq_len} tokens | ejemplos: {len(training)} | validación: {len(validation)}")
     print("Pesos originales aleatorios." if not saved else f"Continuando checkpoint propio desde paso {start_step}.")
     print("Advertencia: los datos de demostración no producen una IA de capacidades avanzadas.")
@@ -100,7 +100,7 @@ def main():
         if step % args.save_every == 0 or step == start_step + args.steps:
             val_loss, val_count = response_nll(model, validation_samples)
             payload = {
-                "architecture": "origen-mythos-v1", "config": asdict(cfg),
+                "architecture": "origen-v2-gqa-v1", "config": asdict(cfg),
                 "step": step, "model": model.state_dict(),
                 "optimizer": optimizer.state_dict(),
                 "train_loss": total_loss, "val_loss": float(val_loss),

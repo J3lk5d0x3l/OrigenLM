@@ -1,16 +1,16 @@
-"""Chat interactivo con los pesos PROPIOS de OrigenLM-Mythos."""
+"""Chat interactivo con los pesos PROPIOS de OrigenLM v2."""
 import argparse
 from pathlib import Path
 
 import torch
 
-from origen.mythos import MythosConfig, OrigenMythos
+from origen.v2 import OrigenV2Config, OrigenV2
 from origen.tokenizer import DEFAULT_SYSTEM, conversation_prefix_limited, decode
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Chat de OrigenLM-Mythos")
-    parser.add_argument("--checkpoint", type=Path, default=Path("checkpoints/mythos_latest.pt"))
+    parser = argparse.ArgumentParser(description="Chat de OrigenLM v2")
+    parser.add_argument("--checkpoint", type=Path, default=Path("checkpoints/origen_v2_latest.pt"))
     parser.add_argument("--system", default=DEFAULT_SYSTEM)
     parser.add_argument("--temperature", type=float, default=0.8)
     parser.add_argument("--top-k", type=int, default=40, help="0 = muestrear todo el vocabulario")
@@ -20,15 +20,15 @@ def main():
     if not args.checkpoint.is_file():
         parser.error(f"No existe el checkpoint: {args.checkpoint}. Entrena antes de conversar.")
     saved = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
-    if saved.get("architecture") != "origen-mythos-v1":
-        parser.error("El checkpoint indicado no es de OrigenLM-Mythos")
-    model = OrigenMythos(MythosConfig(**saved["config"]))
+    if saved.get("architecture") != "origen-v2-gqa-v1":
+        parser.error("El checkpoint indicado no es de OrigenLM v2")
+    model = OrigenV2(OrigenV2Config(**saved["config"]))
     model.load_state_dict(saved["model"])
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device).eval()
     if args.seed is not None:
         torch.manual_seed(args.seed)
-    print(f"OrigenLM-Mythos | paso {saved['step']} | dispositivo={device} | ventana={model.config.max_seq_len}")
+    print(f"OrigenLM v2 | paso {saved['step']} | dispositivo={device} | ventana={model.config.max_seq_len}")
     print("Prototipo en entrenamiento; puede responder incoherencias.")
     print("Escribe /salir para cerrar, /limpiar para reiniciar el historial.")
     history = []
@@ -58,7 +58,7 @@ def main():
             print(f"[Aviso] {exc}")
             continue
         reply = decode(tokens).strip() or "[El modelo no produjo texto útil.]"
-        print("Origen-Mythos >", reply)
+        print("Origen >", reply)
         history.append((question, reply))
         history = history[-10:]
 

@@ -1,27 +1,27 @@
-"""Pruebas mínimas de OrigenLM-Mythos (pesos generados localmente)."""
+"""Pruebas mínimas de OrigenLM-OrigenV2 (pesos generados localmente)."""
 import unittest
 
 import torch
 
-from origen.mythos import MYTHOS_PRESETS, MythosConfig, OrigenMythos
+from origen.v2 import ORIGEN_V2_PRESETS, OrigenV2Config, OrigenOrigenV2
 from origen.chat_training import batchify, tokenize_response
 from origen.tokenizer import conversation_prefix_limited, DEFAULT_SYSTEM, VOCAB_SIZE
 
 
-class MythosTests(unittest.TestCase):
+class OrigenV2Tests(unittest.TestCase):
     def test_config_validates_gqa(self):
         with self.assertRaises(ValueError):
-            MythosConfig(dim=64, n_heads=4, n_kv_heads=3).validate()
+            OrigenV2Config(dim=64, n_heads=4, n_kv_heads=3).validate()
         with self.assertRaises(ValueError):
-            MythosConfig(dim=60, n_heads=4, n_kv_heads=2).validate()
-        for data in MYTHOS_PRESETS.values():
-            MythosConfig(**data).validate()
+            OrigenV2Config(dim=60, n_heads=4, n_kv_heads=2).validate()
+        for data in ORIGEN_V2_PRESETS.values():
+            OrigenV2Config(**data).validate()
 
     def test_forward_backward_assistant_loss(self):
         torch.manual_seed(8)
-        cfg = MythosConfig(dim=64, n_layers=2, n_heads=4, n_kv_heads=2,
+        cfg = OrigenV2Config(dim=64, n_layers=2, n_heads=4, n_kv_heads=2,
                            hidden_dim=128, max_seq_len=128)
-        model = OrigenMythos(cfg)
+        model = OrigenOrigenV2(cfg)
         example = tokenize_response({"user": "Hola", "assistant": "¡Buenas!"}, 128)
         x, y = batchify([example], torch.device("cpu"))
         logits, loss = model(x, y)
@@ -33,9 +33,9 @@ class MythosTests(unittest.TestCase):
 
     def test_generation_context_sliding_and_greedy(self):
         torch.manual_seed(3)
-        cfg = MythosConfig(dim=64, n_layers=1, n_heads=4, n_kv_heads=2,
+        cfg = OrigenV2Config(dim=64, n_layers=1, n_heads=4, n_kv_heads=2,
                            hidden_dim=128, max_seq_len=64)
-        model = OrigenMythos(cfg).eval()
+        model = OrigenOrigenV2(cfg).eval()
         prefix = conversation_prefix_limited(DEFAULT_SYSTEM, [], "Hola", 64)
         a = model.generate(prefix, max_new_tokens=8, temperature=0)
         b = model.generate(prefix, max_new_tokens=8, temperature=0)
@@ -45,9 +45,9 @@ class MythosTests(unittest.TestCase):
             model.generate(prefix, max_new_tokens=0)
 
     def test_unseen_big_context_and_capacity(self):
-        cfg = MythosConfig(dim=64, n_layers=1, n_heads=4, n_kv_heads=2,
+        cfg = OrigenV2Config(dim=64, n_layers=1, n_heads=4, n_kv_heads=2,
                            hidden_dim=128, max_seq_len=256)
-        model = OrigenMythos(cfg)
+        model = OrigenOrigenV2(cfg)
         tokens = torch.randint(0, VOCAB_SIZE, (1, 220))
         logits, _ = model(tokens)
         self.assertEqual(logits.size(1), 220)

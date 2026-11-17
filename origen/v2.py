@@ -1,8 +1,8 @@
-"""OrigenLM-Mythos: decoder Transformer ORIGINAL (sin pesos externos).
+"""OrigenLM v2: decoder Transformer ORIGINAL (sin pesos externos).
 
 Arquitectura propia configurable: RMSNorm, RoPE, GQA, SwiGLU, SDPA,
 pesos enlazados y contexto deslizante. Un nombre no implica las capacidades
-ni la arquitectura privada de Claude Mythos.
+ni la arquitectura privada de un modelo propietario.
 """
 from dataclasses import dataclass
 import math
@@ -14,7 +14,7 @@ from .tokenizer import VOCAB_SIZE, EOS, END
 
 
 @dataclass
-class MythosConfig:
+class OrigenV2Config:
     vocab_size: int = VOCAB_SIZE
     dim: int = 256
     n_layers: int = 6
@@ -39,7 +39,7 @@ class MythosConfig:
             raise ValueError("La dimensión por cabeza debe ser par para RoPE")
 
 
-MYTHOS_PRESETS = {
+ORIGEN_V2_PRESETS = {
     "micro": dict(dim=96, n_layers=2, n_heads=4, n_kv_heads=2,
                   hidden_dim=256, max_seq_len=256),
     "student": dict(dim=256, n_layers=6, n_heads=8, n_kv_heads=2,
@@ -81,7 +81,7 @@ def rope(q: torch.Tensor, k: torch.Tensor):
 
 
 class GroupedQueryAttention(nn.Module):
-    def __init__(self, cfg: MythosConfig):
+    def __init__(self, cfg: OrigenV2Config):
         super().__init__()
         self.n_heads = cfg.n_heads
         self.n_kv_heads = cfg.n_kv_heads
@@ -106,7 +106,7 @@ class GroupedQueryAttention(nn.Module):
 
 
 class SwiGLU(nn.Module):
-    def __init__(self, cfg: MythosConfig):
+    def __init__(self, cfg: OrigenV2Config):
         super().__init__()
         self.gate = nn.Linear(cfg.dim, cfg.hidden_dim, bias=False)
         self.up = nn.Linear(cfg.dim, cfg.hidden_dim, bias=False)
@@ -116,8 +116,8 @@ class SwiGLU(nn.Module):
         return self.down(F.silu(self.gate(x)) * self.up(x))
 
 
-class MythosBlock(nn.Module):
-    def __init__(self, cfg: MythosConfig):
+class OrigenV2Block(nn.Module):
+    def __init__(self, cfg: OrigenV2Config):
         super().__init__()
         self.attn_norm = RMSNorm(cfg.dim, cfg.norm_eps)
         self.attn = GroupedQueryAttention(cfg)
@@ -129,15 +129,15 @@ class MythosBlock(nn.Module):
         return x + self.ffn(self.ffn_norm(x))
 
 
-class OrigenMythos(nn.Module):
+class OrigenV2(nn.Module):
     """Modelo autoregresivo desde cero; compatible con el tokenizador Origen."""
 
-    def __init__(self, cfg: MythosConfig):
+    def __init__(self, cfg: OrigenV2Config):
         super().__init__()
         cfg.validate()
         self.config = cfg
         self.tokens = nn.Embedding(cfg.vocab_size, cfg.dim)
-        self.layers = nn.ModuleList(MythosBlock(cfg) for _ in range(cfg.n_layers))
+        self.layers = nn.ModuleList(OrigenV2Block(cfg) for _ in range(cfg.n_layers))
         self.norm = RMSNorm(cfg.dim, cfg.norm_eps)
         self.lm_head = nn.Linear(cfg.dim, cfg.vocab_size, bias=False)
         self.apply(self._init_weights)
