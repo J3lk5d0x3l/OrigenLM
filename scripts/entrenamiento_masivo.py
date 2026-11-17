@@ -13,8 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def execute(command):
-    print("
-[OrigenLM] Ejecutando:", " ".join(map(str, command)), flush=True)
+    print("\n[OrigenLM] Ejecutando:", " ".join(map(str, command)), flush=True)
     subprocess.run(command, cwd=ROOT, check=True)
 
 
