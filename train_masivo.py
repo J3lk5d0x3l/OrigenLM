@@ -18,7 +18,7 @@ import torch
 from torch.nn import functional as F
 
 from origen.model import ModelConfig, OrigenLM
-from origen.resources import configure_cpu_threads
+from origen.resources import configure_cpu_threads, effective_cpu_count
 
 
 def read_shards(folder: Path, context: int):
@@ -97,6 +97,7 @@ def main():
         p.error(f"Checkpoint original no encontrado: {args.inicial}")
     args.salida.parent.mkdir(parents=True, exist_ok=True)
     torch.manual_seed(args.seed)
+    os.environ.setdefault("ORIGEN_CPU_THREADS", str(effective_cpu_count()))
     threads = configure_cpu_threads("train")
     device = torch.device("cpu")
     shards, meta = read_shards(args.corpus, args.seq_len)
