@@ -10,7 +10,7 @@ Investigación reproducible · Pesos propios · Comunidad latinoamericana
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Licencia](https://img.shields.io/badge/licencia-MIT-555555)](LICENSE)
 
-[**Comenzar**](#comenzar) · [**Arquitectura**](ARQUITECTURA.md) · [**Colaborar**](CONTRIBUTING.md) · [**Discord**](https://discord.biron.net)
+[**Comenzar**](#comenzar) · [**Arquitectura**](ARQUITECTURA.md) · [**Colaborar**](CONTRIBUTING.md) · [**Discord**](https://discord.vyrron.net)
 
 </div>
 
@@ -91,6 +91,6 @@ Para reportar una vulnerabilidad consulta [SECURITY.md](SECURITY.md); no publiqu
 
 ¿Quieres aportar a una IA desarrollada desde Colombia?
 
-**[Únete a Discord — discord.biron.net](https://discord.vyrron.net)**
+**[Únete a Discord — discord.vyrron.net](https://discord.vyrron.net)**
 
 <sub>Código bajo licencia [MIT](LICENSE). Los derechos y condiciones de uso de fuentes externas y checkpoints son independientes.</sub>
