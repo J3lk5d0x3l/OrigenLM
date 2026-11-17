@@ -13,3 +13,10 @@ checkpoints/*.pt
 !.env.example
 # Local transfer bundles - do not commit exported data
 dist/
+
+# Corpus grandes y archivos privados que NO deben versionarse
+dataset/fuentes/
+dataset/preparado/
+dataset/fuentes_procedencia.json
+dataset/correcciones_locales.jsonl
+conversaciones/

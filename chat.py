@@ -64,7 +64,7 @@ def main():
             break
         if user.lower() == "/actualizar":
             lanzador = Path(__file__).resolve().parent / "scripts/origen"
-            os.execv("/bin/bash", ["/bin/bash", str(lanzador), "v1"])
+            os.execv("/bin/bash", ["/bin/bash", str(lanzador)])
         if user.lower() == "/limpiar":
             history.clear()
             print("History cleared.")

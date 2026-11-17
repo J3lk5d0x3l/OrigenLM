@@ -68,7 +68,7 @@ def main():
             break
         if question.casefold() == "/actualizar":
             lanzador = Path(__file__).resolve().parent / "scripts/origen"
-            os.execv("/bin/bash", ["/bin/bash", str(lanzador), "v2"])
+            os.execv("/bin/bash", ["/bin/bash", str(lanzador)])
         if question.casefold() == "/limpiar":
             history.clear()
             print("Historial reiniciado.")

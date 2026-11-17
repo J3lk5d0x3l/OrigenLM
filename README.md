@@ -225,3 +225,58 @@ efectivos y configura sus hilos CPU sin fijar el antiguo valor de 2;
 el chat usa hasta 2 por defecto para minimizar latencia. No se
 pretende asignar el 100 % de RAM/disco: eso provocaría falta de recursos.
 El corpus disponible sigue siendo pequeño.
+
+
+## Etapa de preentrenamiento masivo de los pesos ORIGINALES (CPU)
+
+El commit de agente anterior incorporaba conectores a modelos externos;
+**se retiraron completamente**. `origen agente`, `origen preguntar`,
+`origen` y los checkpoints usan exclusivamente nuestros pesos de OrigenLM.
+Las herramientas Internet/MCP siguen presentes, pero únicamente funcionan
+mediante `/buscar TEXTO`, `/pagina URL` o `/usar HERRAMIENTA {JSON}`.
+El pequeño modelo actual no está entrenado para decidir llamadas a herramientas
+por sí solo; no se finge que lo haga. Herramientas sensibles requieren permiso.
+
+### Ejecutar desde el chat abierto en PowerShell + SSH
+
+1. Escribe `/actualizar` una vez: el lanzador trae cambios mediante
+   `git pull --ff-only` SOLO cuando el árbol de trabajo esté limpio.
+2. Escribe `/entrenar-masivo` dentro del chat.
+3. El sistema descarga documentos oficiales con licencias permitidas (Python:
+   PSF-2.0; libros Rust: MIT/Apache-2.0), prepara un corpus sin cargarlo íntegro
+   en RAM, inicia entrenamiento **real de los pesos originales v1**, y después
+   ajuste supervisado conversacional usando sus 133 ejemplos originales.
+4. Por defecto se intentan **20.000 pasos adicionales**, hasta un máximo de
+   **180 minutos por sesión** para no agotar la cuota de CPU, y luego guarda.
+   Se puede reanudar sin borrar los pesos. La tasa real de tokens/s aparecerá
+   en la terminal del Codespace: no inventamos velocidades antes de medir.
+5. Los nuevos archivos son `checkpoints/origen_masivo.pt` y
+   `checkpoints/origen_ajustado.pt`. **NO se sobreescriben**
+   `checkpoints/origen_latest.pt` ni los respaldos de 200/300 pasos.
+6. Cuando termine, vuelve automáticamente al chat con los pesos ajustados.
+
+Personalizar desde la terminal, si fuera necesario:
+
+```bash
+origen entrenar-masivo --dry-run
+origen entrenar-masivo --steps 20000 --max-minutes 180 --sft-steps 500
+```
+
+**No se realiza entrenamiento automático al hacer git pull o una prueba de CI**:
+las 4 CPU, 16 GiB RAM y 32 GiB de disco pertenecen al Codespace del usuario,
+al cual GitHub Actions no puede ejecutar trabajo sin una sesión autorizada.
+La orden anterior necesita ejecutarse una vez en esa terminal.
+
+### Datos y límites técnicos
+
+El dataset previo tenía 133 pares Q/A; eso NO basta para inteligencia general.
+La nueva biblioteca es sustancialmente mayor y se mide realmente tras
+descargar, pero no equivale a billones de tokens ni a capacidades de frontera.
+El tokenizador original sigue siendo por bytes (vocabulario 262). Se conserva
+así para poder **continuar los pesos originales**: cambiarlo rompería la
+compatibilidad del checkpoint. Un futuro OrigenLM v2 podrá usar BPE propio
+y necesitará entrenamiento nuevo desde cero.
+
+Para evitar filtración y gastos, `dataset/fuentes/`, `dataset/preparado/` y
+sus metadatos se ignoran por Git. No subir corpora ni claves. Fuentes nuevas
+deben tener licencia verificada y derechos de entrenamiento.
