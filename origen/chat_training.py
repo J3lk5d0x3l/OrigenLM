@@ -49,7 +49,7 @@ def tokenize_response(item: dict, max_seq_len: int) -> tuple[list[int], list[int
     if len(tokens) - 1 > max_seq_len:
         raise ValueError(
             f"Ejemplo demasiado largo ({len(tokens)-1} > {max_seq_len} tokens): "
-            f"{item['user'][:55]!r}. Aumenta --context o revisa el dataset."
+            f"{item['user'][:55]!r}. Usa un preset o config con max_seq_len mayor."
         )
     assistant_pos = tokens.index(ASSISTANT)
     inputs = tokens[:-1]
