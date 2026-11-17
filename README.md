@@ -2,7 +2,7 @@
 
 # OrigenLM
 
-**Un modelo de lenguaje abierto, creado desde cero en Colombia.**
+**Un modelo de lenguaje abierto, creado en Colombia.**
 
 Investigación reproducible · Pesos propios · Comunidad latinoamericana
 
@@ -91,6 +91,6 @@ Para reportar una vulnerabilidad consulta [SECURITY.md](SECURITY.md); no publiqu
 
 ¿Quieres aportar a una IA desarrollada desde Colombia?
 
-**[Únete a Discord — discord.biron.net](https://discord.biron.net)**
+**[Únete a Discord — discord.biron.net](https://discord.vyrron.net)**
 
 <sub>Código bajo licencia [MIT](LICENSE). Los derechos y condiciones de uso de fuentes externas y checkpoints son independientes.</sub>
