@@ -2,6 +2,7 @@ __pycache__/
 *.py[cod]
 .venv/
 .env
+.runtime/
 
 # Pesos y binarios descargados (no se versionan)
 models/

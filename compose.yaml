@@ -1,0 +1,44 @@
+name: origenlm
+
+# Plataforma local de desarrollo. Kaggle continúa siendo el entorno de entrenamiento GPU.
+services:
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    environment:
+      OLLAMA_HOST: 0.0.0.0:11434
+    volumes:
+      - origen_ollama:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 20s
+      timeout: 15s
+      retries: 10
+      start_period: 30s
+
+  anythingllm:
+    image: mintplexlabs/anythingllm:latest
+    restart: unless-stopped
+    depends_on:
+      ollama:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3001:3001"
+    env_file:
+      - ./.runtime/secrets.env
+    environment:
+      SERVER_PORT: "3001"
+      STORAGE_DIR: /app/server/storage
+      LLM_PROVIDER: ollama
+      OLLAMA_BASE_PATH: http://ollama:11434
+      OLLAMA_MODEL_PREF: ${ORIGEN_MODEL:-qwen2.5-coder:1.5b}
+      OLLAMA_MODEL_TOKEN_LIMIT: "4096"
+      VECTOR_DB: lancedb
+      EMBEDDING_ENGINE: native
+      PASSWORDMINCHAR: "12"
+    volumes:
+      - ./.runtime/anythingllm/storage:/app/server/storage
+      - ./.runtime/anythingllm/.env:/app/server/.env
+
+volumes:
+  origen_ollama:

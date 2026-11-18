@@ -8,6 +8,20 @@ El proyecto dejó atrás la etapa de entrenar una arquitectura desde cero: ahora
 apoya en pesos abiertos ya entrenados y concentra el trabajo en los datos, el
 ajuste fino y el uso local.
 
+## Plataforma nueva: chat y backend listos para Codespaces
+
+OrigenLM integra **AnythingLLM** (interfaz y API) con **Ollama** (modelo local ligero). El entrenamiento QLoRA en Kaggle sigue siendo independiente.
+
+En el Codespace ejecuta **Terminal → Run Task → All Services (OrigenLM)**, o desde la terminal:
+
+```bash
+bash scripts/start_services.sh
+```
+
+Luego abre el **puerto privado 3001** en **Ports** y completa la creación del administrador. El modelo inicial es `qwen2.5-coder:1.5b` para ajustarse a 4 CPU / 16 GB RAM. En el panel cambia la marca a **OrigenLM** desde Settings → Customization → Branding & Whitelabeling.
+
+**Guía completa:** [docs/PLATAFORMA.md](docs/PLATAFORMA.md). Esta integración utiliza la imagen upstream de AnythingLLM; no reemplaza ni borra los scripts existentes. El adaptador de Kaggle todavía requiere exportación a un formato compatible antes de poder usarlo aquí.
+
 ## Qué hace hoy
 
 | Camino | Comando | Dónde corre |
