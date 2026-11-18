@@ -93,8 +93,11 @@ class PresupuestoTests(unittest.TestCase):
     def test_amplia_calendario_si_se_pide_mas(self):
         self.assertEqual(t.planificar_pasos(500, 3000, None, 3000), (3500, 3500))
 
-    def test_total_explicito_manda(self):
-        self.assertEqual(t.planificar_pasos(500, 10, 2000, 3000), (2000, 2000))
+    def test_total_explicito_fija_horizonte(self):
+        # --pasos-total fija el horizonte del coseno, no los pasos nuevos.
+        self.assertEqual(t.planificar_pasos(500, 10, 2000, 3000), (510, 2000))
+        # Si se piden más pasos que el horizonte, la ejecución se corta en él.
+        self.assertEqual(t.planificar_pasos(500, 5000, 2000, 3000), (2000, 2000))
         with self.assertRaises(ValueError):
             t.planificar_pasos(500, 10, 400)
 

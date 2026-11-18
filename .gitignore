@@ -32,3 +32,5 @@ conversaciones/
 *.p12
 *.pfx
 *.key
+models/
+tools/
