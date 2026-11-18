@@ -1,76 +1,56 @@
-<div align="center">
-
 # OrigenLM
 
-**Inteligencia artificial creada desde Colombia.**
+Asistente de código y conversación en español, construido sobre modelos abiertos
+**Qwen2.5-Coder** (licencia Apache 2.0) con un flujo propio de datos, evaluación y
+fine-tuning.
 
-Un proyecto independiente para desarrollar modelos de lenguaje con pesos propios, investigación abierta y una comunidad de colaboradores de Latinoamérica.
+El proyecto dejó atrás la etapa de entrenar una arquitectura desde cero: ahora se
+apoya en pesos abiertos ya entrenados y concentra el trabajo en los datos, el
+ajuste fino y el uso local.
 
-[![Tests](https://github.com/J3lk5d0x3l/OrigenLM/actions/workflows/tests.yml/badge.svg)](https://github.com/J3lk5d0x3l/OrigenLM/actions/workflows/tests.yml)
-[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-555555.svg)](LICENSE)
-[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-EA4AAA?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/J3lk5d0x3l)
+## Qué hace hoy
 
-[**Comenzar**](#comenzar) · [**Colaborar**](#colaborar) · [**Patrocinar**](#patrocinar) · [**Discord**](https://discord.vyrron.net)
+| Camino | Comando | Dónde corre |
+|---|---|---|
+| Chatear | `bash scripts/chat_local.sh` | codespace / CPU (≈6 tok/s) |
+| Preparar datos | `python scripts/preparar_sft.py` | cualquier lado |
+| Fine-tuning (QLoRA) | `python train_qlora.py` | GPU (Kaggle T4) |
 
-</div>
+La primera vez, el chat descarga el modelo (~4,4 GB) en `models/`, que no se
+versiona. Guía completa: [ENTRENAMIENTO.md](docs/ENTRENAMIENTO.md).
 
----
+## Requisitos
 
-## El proyecto
-
-**OrigenLM** busca construir una inteligencia artificial desarrollada desde cero, con identidad colombiana y participación abierta de la comunidad. El código incluye modelos Transformer, tokenizadores propios, herramientas de entrenamiento, evaluación y una interfaz experimental por terminal.
-
-El propósito es avanzar hacia un asistente accesible y útil, construido con transparencia y colaboración.
-
-> OrigenLM sigue en investigación. El código público no incluye los checkpoints entrenados ni implica que exista ya un asistente de producción.
-
-## Comenzar
-
-Requiere Python 3.11 o superior.
+- Python 3.11 o superior.
+- Para chatear: nada más (llama.cpp se descarga solo).
+- Para entrenar: GPU con 16 GB de VRAM o más (Kaggle T4 alcanza).
 
 ```bash
 git clone https://github.com/J3lk5d0x3l/OrigenLM.git
 cd OrigenLM
-python -m pip install -r requirements.txt
-python -m unittest discover -s tests -v
-python -m origen.cli estado
 ```
-
-En Codespaces también puedes utilizar el comando `origen` para abrir el proyecto una vez instalado el entorno. Consulta la [guía de desarrollo](docs/DESARROLLO.md) para preparar datos y trabajar con los entrenadores.
 
 ## Estructura
 
 ```text
-origen/       Arquitecturas, tokenizadores y herramientas
-scripts/      Procesamiento de datos, entrenamiento y utilidades
-dataset/      Ejemplos públicos y datos de evaluación
-tests/        Pruebas automatizadas del proyecto
-docs/         Documentación técnica
-train*.py     Entrenadores
-chat*.py      Interfaces de conversación experimentales
+chat_local.py        Chat con el modelo abierto (llama.cpp)
+train_qlora.py       Fine-tuning QLoRA sobre Qwen2.5-Coder
+scripts/
+  chat_local.sh      Arranca el servidor local y abre el chat
+  preparar_sft.py    Convierte diálogos al formato de entrenamiento
+dataset/             Diálogos de ejemplo
+docs/                Guía de entrenamiento
+notebooks/           Notebook listo para Kaggle (GPU T4)
+models/ tools/       Pesos y binarios descargados (ignorados por Git)
 ```
 
-## Colaborar
+## Uso desde OpenCode
 
-¿Te gustaría mejorar el modelo, aportar datos autorizados, programar herramientas o trabajar en la infraestructura?
+`scripts/chat_local.sh` levanta una API compatible con OpenAI en
+`http://127.0.0.1:8080/v1`. Cualquier cliente compatible (OpenCode, Cline,
+Continue) puede usarla como proveedor.
 
-**[Únete a nuestro Discord](https://discord.vyrron.net)** y cuéntanos que quieres colaborar en OrigenLM, en qué área te gustaría participar y qué experiencia tienes. Coordinamos propuestas y después trabajamos mediante *issues* y *pull requests*.
+## Licencia
 
-Lee la [guía para colaboradores](CONTRIBUTING.md) antes de enviar cambios.
-
-## Patrocinar
-
-OrigenLM necesita infraestructura, almacenamiento y capacidad de cómputo para seguir creciendo. Los patrocinios apoyan su investigación y el objetivo de hacer el modelo cada vez más accesible públicamente.
-
-**[Apoya el desarrollo en GitHub Sponsors](https://github.com/sponsors/J3lk5d0x3l)**
-
----
-
-<div align="center">
-  <sub>
-    Código bajo <a href="LICENSE">licencia MIT</a> ·
-    Nombre e identidad de OrigenLM sujetos a la <a href="TRADEMARKS.md">política de marca</a> ·
-    <a href="https://discord.vyrron.net">Comunidad Discord</a>
-  </sub>
-</div>
+Código bajo [MIT](LICENSE). Los pesos de Qwen2.5-Coder pertenecen a Alibaba
+Cloud y se distribuyen bajo Apache 2.0.

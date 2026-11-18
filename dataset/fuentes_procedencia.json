@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "name": "rust-book",
+      "url": "https://github.com/rust-lang/book/archive/refs/heads/main.tar.gz",
+      "license": "Apache-2.0 OR MIT",
+      "files": 650,
+      "download_bytes": 5974417,
+      "cached": false
+    },
+    {
+      "name": "rust-reference",
+      "url": "https://github.com/rust-lang/reference/archive/refs/heads/master.tar.gz",
+      "license": "Apache-2.0 OR MIT",
+      "files": 156,
+      "download_bytes": 438958,
+      "cached": false
+    },
+    {
+      "name": "rust-by-example",
+      "url": "https://github.com/rust-lang/rust-by-example/archive/refs/heads/master.tar.gz",
+      "license": "Apache-2.0 OR MIT",
+      "files": 206,
+      "download_bytes": 870053,
+      "cached": false
+    },
+    {
+      "name": "python-docs",
+      "url": "https://github.com/python/cpython/tree/3.14/Doc",
+      "license": "PSF-2.0",
+      "files": 389
+    }
+  ],
+  "files_total": 1401,
+  "bytes_total": 13036666,
+  "licenses": [
+    "https://github.com/rust-lang/book/blob/main/LICENSE-MIT",
+    "https://github.com/rust-lang/book/blob/main/LICENSE-APACHE",
+    "https://github.com/python/cpython/blob/3.14/LICENSE"
+  ],
+  "notice": "Conserva atribuciones y verifica licencias antes de redistribuir."
+}

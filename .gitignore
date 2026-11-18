@@ -1,36 +1,13 @@
-# Python / editors
-.venv/
 __pycache__/
 *.py[cod]
-.pytest_cache/
-.vscode/
-# generated model checkpoints (store separately from source)
-checkpoints/*.pt
-*.log
-# credentials
+.venv/
 .env
-.env.*
-!.env.example
-# Local transfer bundles - do not commit exported data
-dist/
 
-# Corpus grandes y archivos privados que NO deben versionarse
-dataset/fuentes/
-dataset/preparado/
-dataset/fuentes_es/
-dataset/preparado_v2/
-dataset/preparado_v2_es/
-dataset/fuentes_procedencia.json
-dataset/correcciones_locales.jsonl
-conversaciones/
-
-# Otros artefactos entrenados y secretos locales
-*.pth
-*.ckpt
-*.safetensors
-*.pem
-*.p12
-*.pfx
-*.key
+# Pesos y binarios descargados (no se versionan)
 models/
 tools/
+checkpoints/
+
+# Datos generados
+dataset/sft/
+dataset/*.bin
