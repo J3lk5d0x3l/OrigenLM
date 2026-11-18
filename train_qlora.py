@@ -166,19 +166,26 @@ def main() -> int:
         carga["quantization_config"] = BitsAndBytesConfig(
             load_in_4bit=True, bnb_4bit_quant_type="nf4",
             bnb_4bit_compute_dtype=torch.bfloat16, bnb_4bit_use_double_quant=True)
-        carga["device_map"] = "auto"
+        # Una sola GPU: con device_map="auto" el modelo se reparte entre las dos
+        # T4 y los tensores terminan en dispositivos distintos.
+        carga["device_map"] = {"": 0}
     else:
         carga["dtype"] = torch.float32 if dispositivo == "cpu" else torch.bfloat16
 
     modelo = AutoModelForCausalLM.from_pretrained(args.modelo, **carga)
     if dispositivo == "cuda" and not args.sin_4bit:
         modelo = prepare_model_for_kbit_training(modelo)
+    else:
+        modelo.to(dispositivo)
     modelo = get_peft_model(modelo, LoraConfig(
         r=args.lora_r, lora_alpha=args.lora_alpha, lora_dropout=args.lora_dropout,
         bias="none", task_type="CAUSAL_LM",
         target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
                         "gate_proj", "up_proj", "down_proj"]))
     modelo.print_trainable_parameters()
+    # Los tensores se crean en el mismo dispositivo donde quedó el modelo.
+    dispositivo = next(modelo.parameters()).device
+    print(f"dispositivo : {dispositivo}")
 
     def preparar(filas):
         salida = []
