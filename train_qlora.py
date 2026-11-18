@@ -44,21 +44,42 @@ def leer_jsonl(ruta: Path) -> list[dict]:
     return filas
 
 
+def _ids(salida) -> list[int]:
+    """Normaliza lo que devuelve apply_chat_template según la versión de transformers.
+
+    En transformers 4 es una lista de enteros; en 5 es un BatchEncoding
+    (o un tensor) y hay que sacar `input_ids` antes de comparar.
+    """
+    if hasattr(salida, "keys"):
+        salida = salida["input_ids"]
+    if hasattr(salida, "tolist"):
+        salida = salida.tolist()
+    if salida and isinstance(salida[0], (list, tuple)):
+        salida = salida[0]
+    return [int(x) for x in salida]
+
+
 def construir_ejemplo(tokenizer, mensajes: list[dict], max_len: int):
     """Tokeniza y deja -100 en el prompt: solo se aprende de la respuesta."""
-    completo = tokenizer.apply_chat_template(mensajes, tokenize=True,
-                                             add_generation_prompt=False)
-    previo = tokenizer.apply_chat_template(mensajes[:-1], tokenize=True,
-                                           add_generation_prompt=True)
-    corte = 0
-    for a, b in zip(previo, completo):
-        if a != b:
-            break
-        corte += 1
-    ids = list(completo[:max_len])
-    etiquetas = list(ids)
-    for i in range(min(corte, len(etiquetas))):
-        etiquetas[i] = -100
+    prompt = _ids(tokenizer.apply_chat_template(mensajes[:-1], tokenize=True,
+                                                add_generation_prompt=True))
+    completo = _ids(tokenizer.apply_chat_template(mensajes, tokenize=True,
+                                                 add_generation_prompt=False))
+
+    if len(completo) > len(prompt) and completo[:len(prompt)] == prompt:
+        ids, corte = completo, len(prompt)
+    else:
+        # Algunos tokenizadores no devuelven el prompt como prefijo exacto
+        # (depende de la versión de transformers). Se arma a mano con el
+        # texto de la respuesta y el token de fin.
+        respuesta = _ids(tokenizer(mensajes[-1]["content"],
+                                   add_special_tokens=False)["input_ids"])
+        fin = [tokenizer.eos_token_id] if tokenizer.eos_token_id is not None else []
+        ids, corte = prompt + respuesta + fin, len(prompt)
+
+    ids = ids[:max_len]
+    corte = min(corte, len(ids))
+    etiquetas = [-100] * corte + ids[corte:]
     return ids, etiquetas
 
 
