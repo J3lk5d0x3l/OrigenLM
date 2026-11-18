@@ -21,5 +21,8 @@
       "label": "OrigenLM - Chat",
       "onAutoForward": "notify"
     }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   }
 }

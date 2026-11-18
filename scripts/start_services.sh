@@ -4,11 +4,11 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 if ! command -v docker >/dev/null 2>&1; then
-  echo "ERROR: falta Docker. Abre este repositorio dentro de GitHub Codespaces con Docker disponible." >&2
+  echo "ERROR: falta Docker dentro del Codespace. En VS Code de escritorio: Ctrl+Shift+P → Codespaces: Rebuild Container; reconecta y repite." >&2
   exit 1
 fi
 if ! docker info >/dev/null 2>&1; then
-  echo "ERROR: el daemon de Docker no está disponible en este Codespace (docker info falló)." >&2
+  echo "ERROR: el daemon Docker del Codespace no está listo (docker info falló). Tras reconstruir, comprueba docker info." >&2
   exit 1
 fi
 if ! docker compose version >/dev/null 2>&1; then

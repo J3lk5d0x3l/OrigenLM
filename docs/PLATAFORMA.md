@@ -7,6 +7,34 @@
 
 El código completo de AnythingLLM **no está copiado dentro de este repositorio**: se usa su contenedor oficial. Su UI se puede personalizar desde el panel; para modificaciones profundas al código habría que desarrollar un fork propio. Proyecto original: https://github.com/Mintplex-Labs/anything-llm (MIT).
 
+
+## Docker sin abrir Codespaces en el navegador
+
+El repositorio configura el Feature oficial `ghcr.io/devcontainers/features/docker-in-docker:2`
+en `.devcontainer/devcontainer.json`. **No necesitas instalar Docker Desktop** en tu
+portátil: el motor Docker funciona dentro de tu Codespace remoto.
+
+**Si tu Codespace ya existía antes de este cambio**, es obligatorio reconstruirlo:
+
+1. Desde **VS Code de escritorio conectado al Codespace**, abre una terminal y ejecuta
+   `git pull --ff-only origin main`. Si Git detecta cambios locales, respáldalos
+   con `git stash push` y repite el pull.
+2. Presiona **Ctrl + Shift + P** y elige **Codespaces: Rebuild Container**.
+   Espera a que VS Code vuelva a conectarse. No hace falta usar el navegador.
+3. En la terminal remota ejecuta `docker --version`, `docker info` y
+   `docker compose version` para confirmar la instalación y el daemon.
+4. Ejecuta `bash scripts/start_services.sh` o
+   **Terminal → Run Task → All Services (OrigenLM)**.
+5. Abre el **puerto privado 3001** desde el panel **Ports** de VS Code.
+
+**Atención:** no uses *Full Rebuild* salvo necesidad: puede limpiar imágenes,
+contenedores y volúmenes de Docker del Codespace. Haz respaldo de tus datos de
+AnythingLLM y modelos antes de reconstruir si ya tuvieras datos relevantes allí.
+
+Si `docker info` sigue fallando tras reconstruir, envía la salida de ese comando
+para diagnosticar el daemon del Codespace. Una terminal local de Windows
+sin conexión remota al Codespace no tendrá acceso a este Docker.
+
 ## Iniciar con un clic en Codespaces
 1. Abre `J3lk5d0x3l/OrigenLM` en GitHub Codespaces. Si el Codespace ya está abierto, ejecuta `git pull origin main`.
 2. En VS Code, selecciona **Terminal → Run Task → All Services (OrigenLM)**.
