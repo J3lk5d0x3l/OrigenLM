@@ -1,7 +1,7 @@
 # Entrenamiento y fine-tuning (GPU recomendada)
 torch>=2.2
 transformers>=4.45
-peft>=0.13
+peft>=0.22.0
 accelerate>=0.34
 bitsandbytes>=0.44
 huggingface_hub>=0.24
